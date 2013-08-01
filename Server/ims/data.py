@@ -245,11 +245,11 @@ class Incident (object):
     def __hash__(self):
         return hash((
             self.number,
-            self.rangers,
+            tuple(self.rangers),
             self.location,
-            self.incident_types,
+            tuple(self.incident_types),
             self.summary,
-            self.report_entries,
+            tuple(self.report_entries),
             self.created,
             self.dispatched,
             self.on_scene,
