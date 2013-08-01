@@ -3,11 +3,30 @@
  <head>
   <title t:render="title" />
   <link rel="icon" href="/resources/ranger.png" type="image/png" />
+  <link rel="stylesheet" type="text/css" href="/tidy.css" />
+  <script type="text/javascript" src="/jquery.js" />
+  <script type="text/javascript" src="/tidy.js" />
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#DailyStats').TidyTable(
+        {
+          // Options
+          enableCheckbox: false,
+          enableMenu    : false,
+        },
+        {
+          // Data
+          columnTitles: <t:transparent t:render="columns" />,
+          columnValues: <t:transparent t:render="data"    />,
+        }
+      );
+    });
+  </script>
  </head>
  <body>
   <h1 t:render="title" />
 
-  <p>TBD</p>
+  <div id="DailyStats" />
 
  </body>
 </html>

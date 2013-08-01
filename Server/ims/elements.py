@@ -157,6 +157,19 @@ class DailyReportElement(BaseElement):
         BaseElement.__init__(self, ims, "report_daily", "Daily Report")
 
 
+    @renderer
+    def columns(self, request, tag):
+        return to_json_text([
+        ])
+
+
+    @renderer
+    def data(self, request, tag):
+        data = []
+
+        return to_json_text(data)
+
+
 
 def incidents_from_query(ims, request):
     if not hasattr(request, "ims_incidents"):
