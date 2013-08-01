@@ -157,9 +157,33 @@ class DailyReportElement(BaseElement):
         BaseElement.__init__(self, ims, "report_daily", "Daily Report")
 
 
+    def incidents_by_date(self):
+        if not hasattr(self, "_incidents_by_date"):
+            storage = self.ims.storage
+            incidents_by_date = {}
+
+            for number, etag in storage.list_incidents():
+                incident = storage.read_incident_with_number(number)
+
+                for entry in incident.report_entries:
+                    created = entry.created
+                    if created.hour < 12:
+                        date = created.date() - timedelta(days=1)
+                    else:
+                        date = created.date()
+
+                    incidents_by_date.setdefault(date, set()).add(incident)
+
+            self._incidents_by_date = incidents_by_date
+
+        return self._incidents_by_date
+
+
     @renderer
     def columns(self, request, tag):
-        return to_json_text([
+        return to_json_text(["Type"] + [
+            date.strftime("%a %b %d")
+            for date in self.incidents_by_date()
         ])
 
 
