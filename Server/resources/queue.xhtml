@@ -37,9 +37,18 @@
   <form action="" method="get">
    <input type="hidden" name="show_closed" value="off" />
    <input type="hidden" name="search" t:render="search_value" />
-   <input type="checkbox" onclick="this.form.children[0].value=this.checked; this.form.submit();" t:render="show_closed_checked">
-    Show Closed
-   </input>
+   <label>
+    <input type="checkbox" onclick="this.form.children[0].value=this.checked; this.form.submit();" t:render="show_closed_checked" />
+    Show closed
+   </label>
+   <label>
+    <select name="since_days_ago" onclick="this.form.submit();">
+     <option value="0" t:render="since_days_ago_selected">All days</option>
+     <option value="1" t:render="since_days_ago_selected">Since 1 day ago</option>
+     <option value="2" t:render="since_days_ago_selected">Since 2 days ago</option>
+     <option value="3" t:render="since_days_ago_selected">Since 3 days ago</option>
+    </select>
+   </label>
   </form>
 
  </body>

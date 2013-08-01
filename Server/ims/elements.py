@@ -24,6 +24,8 @@ __all__ = [
     "incidents_from_query",
 ]
 
+from datetime import datetime, timedelta
+
 from twisted.web.template import Element, renderer
 from twisted.web.template import XMLFile
 
@@ -141,13 +143,22 @@ class DispatchQueueElement(BaseElement):
             return tag
 
 
+    @renderer
+    def since_days_ago_selected(self, request, tag):
+        if tag.attributes["value"] == since_days_ago_from_query(request):
+            return tag(selected="")
+        else:
+            return tag;
+
+
 
 def incidents_from_query(ims, request):
     if not hasattr(request, "ims_incidents"):
         if request.args:
             request.ims_incidents = ims.storage.search_incidents(
-                terms       = terms_from_query(request),
+                terms = terms_from_query(request),
                 show_closed = show_closed_from_query(request),
+                since = since_from_query(request),
             )
         else:
             request.ims_incidents = ims.storage.list_incidents()
@@ -176,14 +187,43 @@ def terms_from_query(request):
 
 
 def show_closed_from_query(request):
-    if not hasattr(request, "ims_show_closed"):
+    return query_value(request, "show_closed", "false", "true") == "true"
+
+
+def since_days_ago_from_query(request):
+    return query_value(request, "since_days_ago", "0")
+
+
+def since_from_query(request):
+    try:
+        days = int(since_days_ago_from_query(request))
+    except ValueError:
+        days = 0
+
+    if not days:
+        return None
+
+    return datetime.utcnow() - timedelta(days=days)
+
+
+def query_value(request, key, default, no_args_default=None):
+    attr_name = "ims_qv_{0}".format(key)
+
+    if not hasattr(request, attr_name):
         if request.args:
             try:
-                request.ims_show_closed = request.args.get("show_closed", ["false"])[-1] == "true"
+                setattr(request, attr_name, request.args.get(key, [default])[-1])
+                print "found", key
             except IndexError:
-                request.ims_show_closed = False
+                setattr(request, attr_name, default)
+                print "index error"
         else:
-            # Must be True to match incidents_from_query() behavior
-            request.ims_show_closed = True
+            if no_args_default is not None:
+                setattr(request, attr_name, no_args_default)
+                print "no args default"
+            else:
+                setattr(request, attr_name, default)
+                print "no args"
 
-    return request.ims_show_closed
+    print attr_name, repr(getattr(request, attr_name))
+    return getattr(request, attr_name)
