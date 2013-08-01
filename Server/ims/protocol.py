@@ -38,6 +38,7 @@ from ims.sauce import url_for, set_response_header
 from ims.sauce import http_sauce
 from ims.sauce import HeaderName, ContentType
 from ims.elements import HomePageElement, DispatchQueueElement
+from ims.elements import DailyReportElement
 from ims.elements import incidents_from_query
 
 
@@ -314,6 +315,13 @@ class IncidentManagementSystem(object):
 
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
         return DispatchQueueElement(self)
+
+
+    @app.route("/reports/daily", methods=("GET",))
+    @http_sauce
+    def daily_report(self, request):
+        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        return DailyReportElement(self)
 
 
     @app.route("/jquery.js", methods=("GET",))

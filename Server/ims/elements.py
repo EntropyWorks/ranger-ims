@@ -152,6 +152,12 @@ class DispatchQueueElement(BaseElement):
 
 
 
+class DailyReportElement(BaseElement):
+    def __init__(self, ims):
+        BaseElement.__init__(self, ims, "report_daily", "Daily Report")
+
+
+
 def incidents_from_query(ims, request):
     if not hasattr(request, "ims_incidents"):
         if request.args:
