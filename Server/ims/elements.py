@@ -254,6 +254,15 @@ class DailyReportElement(BaseElement):
 
             rows.append(row)
 
+        row = ["Total"]
+        seen = set()
+        for date in sorted(incidents_by_date):
+            incidents = incidents_by_date[date]
+            seen |= incidents
+            row.append(len(incidents))
+        row.append(len(seen))
+        rows.append(row)
+
         return to_json_text(rows)
 
 
