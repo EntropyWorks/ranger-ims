@@ -22,13 +22,8 @@ __all__ = [
     "IncidentManagementSystem",
 ]
 
-from twisted.python import log
-from twisted.internet import reactor
-from twisted.internet.defer import Deferred
-from twisted.internet.protocol import Protocol
 from twisted.web import http
 from twisted.web.static import File
-from twisted.web.client import Agent, ResponseDone
 from twisted.web.template import Element, XMLFile
 
 from klein import Klein
@@ -41,6 +36,7 @@ from ims.sauce import HeaderName, ContentType
 from ims.elements import HomePageElement, DispatchQueueElement
 from ims.elements import DailyReportElement
 from ims.elements import incidents_from_query
+from ims.util import http_download
 
 
 
@@ -421,35 +417,6 @@ class IncidentManagementSystem(object):
         if filePath.exists():
             return File(filePath.path)
 
-        class FileWriter(Protocol):
-            def __init__(self, fp, fin):
-                self.fp = fp
-                self.tmp = fp.temporarySibling(".tmp")
-                self.fh = self.tmp.open("w")
-                self.fin = fin
-
-            def dataReceived(self, bytes):
-                self.fh.write(bytes)
-
-            def connectionLost(self, reason):
-                self.fh.close()
-                if isinstance(reason.value, ResponseDone):
-                    self.tmp.moveTo(self.fp)
-                    self.fin.callback(None)
-                else:
-                    self.fin.errback(reason)
-
-        log.msg("Downloading jquery from {0}".format(url))
-
-        agent = Agent(reactor)
-
-        d = agent.request("GET", url)
-
-        def gotResponse(response):
-            finished = Deferred()
-            response.deliverBody(FileWriter(filePath, finished))
-            return finished
-        d.addCallback(gotResponse)
+        d = http_download(filePath, url)
         d.addCallback(lambda _: File(filePath.path))
-
         return d
