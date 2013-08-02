@@ -1,56 +1,56 @@
 <!DOCTYPE html>
 <html xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
- <head>
-  <title t:render="title" />
-  <link t:render="icon" />
-  <link t:render="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="/tidy.css" />
-  <script type="text/javascript" src="/jquery.js" />
-  <script type="text/javascript" src="/tidy.js" />
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('#DispatchQueue').TidyTable(
-        {
-          // Options
-          enableCheckbox: false,
-          enableMenu    : false,
-        },
-        {
-          // Data
-          columnTitles: <t:transparent t:render="columns" />,
-          columnValues: <t:transparent t:render="data"    />,
-        }
-      );
-      <t:transparent t:render="hide_closed_column" />
-    });
-  </script>
- </head>
- <body>
-  <h1 t:render="title" />
+  <head>
+    <title t:render="title" />
+    <link t:render="icon" />
+    <link t:render="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="/tidy.css" />
+    <script type="text/javascript" src="/jquery.js" />
+    <script type="text/javascript" src="/tidy.js" />
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#DispatchQueue').TidyTable(
+          {
+            // Options
+            enableCheckbox: false,
+            enableMenu    : false,
+          },
+          {
+            // Data
+            columnTitles: <t:transparent t:render="columns" />,
+            columnValues: <t:transparent t:render="data"    />,
+          }
+        );
+        <t:transparent t:render="hide_closed_column" />
+      });
+    </script>
+  </head>
+  <body>
+    <h1 t:render="title" />
 
-  <form action="" method="get">
-   <input type="hidden" name="show_closed" t:render="show_closed_value" />
-   <input type="search" name="search" placeholder="Search..." size="100" autofocus="true" t:render="search_value" />
-  </form>
+    <form action="" method="get">
+      <input type="hidden" name="show_closed" t:render="show_closed_value" />
+      <input type="search" name="search" placeholder="Search..." size="100" autofocus="true" t:render="search_value" />
+    </form>
 
-  <div id="DispatchQueue" />
+    <div id="DispatchQueue" />
 
-  <form action="" method="get">
-   <input type="hidden" name="show_closed" value="off" />
-   <input type="hidden" name="search" t:render="search_value" />
-   <label>
-    <input type="checkbox" onclick="this.form.children[0].value=this.checked; this.form.submit();" t:render="show_closed_checked" />
-    Show closed
-   </label>
-   <label>
-    <select name="since_days_ago" onclick="this.form.submit();">
-     <option value="0" t:render="since_days_ago_selected">All days</option>
-     <option value="1" t:render="since_days_ago_selected">Since 1 day ago</option>
-     <option value="2" t:render="since_days_ago_selected">Since 2 days ago</option>
-     <option value="3" t:render="since_days_ago_selected">Since 3 days ago</option>
-    </select>
-   </label>
-  </form>
+    <form action="" method="get">
+      <input type="hidden" name="show_closed" value="off" />
+      <input type="hidden" name="search" t:render="search_value" />
+      <label>
+        <input type="checkbox" onclick="this.form.children[0].value=this.checked; this.form.submit();" t:render="show_closed_checked" />
+        Show closed
+      </label>
+      <label>
+        <select name="since_days_ago" onclick="this.form.submit();">
+          <option value="0" t:render="since_days_ago_selected">All days</option>
+          <option value="1" t:render="since_days_ago_selected">Since 1 day ago</option>
+          <option value="2" t:render="since_days_ago_selected">Since 2 days ago</option>
+          <option value="3" t:render="since_days_ago_selected">Since 3 days ago</option>
+        </select>
+      </label>
+    </form>
 
- </body>
+  </body>
 </html>

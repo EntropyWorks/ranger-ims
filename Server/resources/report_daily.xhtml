@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
- <head>
-  <title t:render="title" />
-  <link t:render="icon" />
-  <link t:render="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="/tidy.css" />
-  <script type="text/javascript" src="/jquery.js" />
-  <script type="text/javascript" src="/tidy.js" />
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('#DailyStats').TidyTable(
-        {
-          // Options
-          enableCheckbox: false,
-          enableMenu    : false,
-        },
-        {
-          // Data
-          columnTitles: <t:transparent t:render="columns" />,
-          columnValues: <t:transparent t:render="data"    />,
-        }
-      );
-    });
-  </script>
- </head>
- <body>
-  <h1 t:render="title" />
+  <head>
+    <title t:render="title" />
+    <link t:render="icon" />
+    <link t:render="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="/tidy.css" />
+    <script type="text/javascript" src="/jquery.js" />
+    <script type="text/javascript" src="/tidy.js" />
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#DailyStats').TidyTable(
+          {
+            // Options
+            enableCheckbox: false,
+            enableMenu    : false,
+          },
+          {
+            // Data
+            columnTitles: <t:transparent t:render="columns" />,
+            columnValues: <t:transparent t:render="data"    />,
+          }
+        );
+      });
+    </script>
+  </head>
+  <body>
+    <h1 t:render="title" />
 
-  <div id="DailyStats" />
+    <div id="DailyStats" />
 
- </body>
+  </body>
 </html>
