@@ -39,7 +39,7 @@ class BaseElement(Element):
         self.ims = ims
         self._title = title
 
-        self.loader = XMLFile(ims.config.Resources.child(name+".xhtml"))
+        self.loader = XMLFile(ims.config.Resources.child("{0}.xhtml".format(name)))
 
 
     @renderer

@@ -29,6 +29,7 @@ from twisted.internet.protocol import Protocol
 from twisted.web import http
 from twisted.web.static import File
 from twisted.web.client import Agent, ResponseDone
+from twisted.web.template import Element, XMLFile
 
 from klein import Klein
 
@@ -58,12 +59,9 @@ class IncidentManagementSystem(object):
         self.dms = config.dms
 
 
-    @app.route("/", methods=("GET",))
-    @http_sauce
-    def root(self, request):
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
-        return HomePageElement(self)
-
+    #
+    # JSON endpoints
+    #
 
     @app.route("/resources/", branch=True)
     @http_sauce
@@ -166,7 +164,6 @@ class IncidentManagementSystem(object):
                 #print "Client submitted unchaged value for {0}: {1}".format(JSON.describe(key), new)
                 return
 
-            print(JSON.states)
             if key in JSON.states():
                 state_changes.append((key, new))
                 return
@@ -233,7 +230,6 @@ class IncidentManagementSystem(object):
         #
         # Figure out what to report about state changes
         #
-        print("3")
         highest_change = None
         lowest_change = None
         for state_changed, state_time in state_changes:
@@ -307,6 +303,10 @@ class IncidentManagementSystem(object):
         return "";
 
 
+    #
+    # Web UI
+    #
+
     @app.route("/queue", methods=("GET",))
     @http_sauce
     def dispatchQueue(self, request):
@@ -317,12 +317,50 @@ class IncidentManagementSystem(object):
         return DispatchQueueElement(self)
 
 
+    #
+    # Documentation
+    #
+
+    @app.route("/", methods=("GET",))
+    @http_sauce
+    def root(self, request):
+        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        return HomePageElement(self)
+
+
+    @app.route("/docs/", methods=("GET",))
+    @http_sauce
+    def doc_index(self, request):
+        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        document = Element()
+        document.loader = XMLFile(self.config.Resources.child("docs").child("index.xhtml"))
+        return document
+
+
+    @app.route("/docs/<name>", methods=("GET",))
+    @http_sauce
+    def doc_with_name(self, request, name):
+        if name.endswith(".xhtml"):
+            set_response_header(request, HeaderName.contentType, ContentType.HTML)
+            document = Element()
+            document.loader = XMLFile(self.config.Resources.child("docs").child(name))
+            return document
+
+
+    #
+    # Reports
+    #
+
     @app.route("/reports/daily", methods=("GET",))
     @http_sauce
     def daily_report(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
         return DailyReportElement(self)
 
+
+    #
+    # JQuery resources
+    #
 
     @app.route("/jquery.js", methods=("GET",))
     @http_sauce
@@ -371,6 +409,10 @@ class IncidentManagementSystem(object):
         url = "https://raw.github.com/nuxy/Tidy-Table/v1.4/images/arrow_desc.gif"
         return self.cachedResource(name, url)
 
+
+    #
+    # Utilities
+    #
 
     def cachedResource(self, name, url):
         name = "_{0}".format(name)
