@@ -328,17 +328,12 @@ def query_value(request, key, default, no_args_default=None):
         if request.args:
             try:
                 setattr(request, attr_name, request.args.get(key, [default])[-1])
-                print "found", key
             except IndexError:
                 setattr(request, attr_name, default)
-                print "index error"
         else:
             if no_args_default is not None:
                 setattr(request, attr_name, no_args_default)
-                print "no args default"
             else:
                 setattr(request, attr_name, default)
-                print "no args"
 
-    print attr_name, repr(getattr(request, attr_name))
     return getattr(request, attr_name)
