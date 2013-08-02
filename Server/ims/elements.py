@@ -189,6 +189,9 @@ class DailyReportElement(BaseElement):
             for number, etag in storage.list_incidents():
                 incident = storage.read_incident_with_number(number)
 
+                if "Junk" in incident.incident_types:
+                    continue
+
                 for date in dates_from_incident(incident):
                     incidents_by_date.setdefault(date, set()).add(incident)
 
