@@ -27,19 +27,45 @@ __all__ = [
 from datetime import datetime, timedelta
 
 from twisted.python import log
-from twisted.web.template import Element, renderer
+from twisted.web.template import Element, renderer, tags
 from twisted.web.template import XMLFile
 
 from ims.data import to_json_text
 
 
 
-class BaseElement(Element):
+class FileElement(Element):
+    def __init__(self, filePath):
+        self.filePath = filePath
+        self.loader = XMLFile(filePath)
+
+
+    @renderer
+    def icon(self, request, tag):
+        return tags.link(
+            rel="icon",
+            href="/resources/ranger.png",
+            type="image/png",
+        )
+
+
+    @renderer
+    def stylesheet(self, request, tag):
+        return tags.link(
+            rel="stylesheet",
+            media="screen",
+            href="/baseline/compressed/baseline.compress.css",
+            type="text/css",
+        )
+
+
+
+class BaseElement(FileElement):
     def __init__(self, ims, name, title):
+        FileElement.__init__(self, ims.config.Resources.child("{0}.xhtml".format(name)))
+
         self.ims = ims
         self._title = title
-
-        self.loader = XMLFile(ims.config.Resources.child("{0}.xhtml".format(name)))
 
 
     @renderer

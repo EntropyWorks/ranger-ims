@@ -2,7 +2,8 @@
 <html xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
  <head>
   <title t:render="title" />
-  <link rel="icon" href="/resources/ranger.png" type="image/png" />
+  <link t:render="icon" />
+  <link t:render="stylesheet" />
  </head>
  <body>
   <h1 t:render="title" />

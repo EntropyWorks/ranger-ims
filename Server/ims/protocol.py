@@ -22,9 +22,10 @@ __all__ = [
     "IncidentManagementSystem",
 ]
 
+from twisted.python.zippath import ZipArchive
+from twisted.internet.defer import Deferred
 from twisted.web import http
 from twisted.web.static import File
-from twisted.web.template import Element, XMLFile
 
 from klein import Klein
 
@@ -33,7 +34,7 @@ from ims.data import Incident, ReportEntry
 from ims.sauce import url_for, set_response_header
 from ims.sauce import http_sauce
 from ims.sauce import HeaderName, ContentType
-from ims.elements import HomePageElement, DispatchQueueElement
+from ims.elements import FileElement, HomePageElement, DispatchQueueElement
 from ims.elements import DailyReportElement
 from ims.elements import incidents_from_query
 from ims.util import http_download
@@ -58,12 +59,6 @@ class IncidentManagementSystem(object):
     #
     # JSON endpoints
     #
-
-    @app.route("/resources/", branch=True)
-    @http_sauce
-    def favicon(self, request):
-        return File(self.config.Resources.path)
-
 
     @app.route("/ping/", methods=("GET",))
     @http_sauce
@@ -314,6 +309,16 @@ class IncidentManagementSystem(object):
 
 
     #
+    # Resources
+    #
+
+    @app.route("/resources/", branch=True)
+    @http_sauce
+    def favicon(self, request):
+        return File(self.config.Resources.path)
+
+
+    #
     # Documentation
     #
 
@@ -327,20 +332,22 @@ class IncidentManagementSystem(object):
     @app.route("/docs/", methods=("GET",))
     @http_sauce
     def doc_index(self, request):
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
-        document = Element()
-        document.loader = XMLFile(self.config.Resources.child("docs").child("index.xhtml"))
-        return document
+        return self.doc_with_name(request, "index.xhtml")
 
 
     @app.route("/docs/<name>", methods=("GET",))
     @http_sauce
     def doc_with_name(self, request, name):
-        if name.endswith(".xhtml"):
-            set_response_header(request, HeaderName.contentType, ContentType.HTML)
-            document = Element()
-            document.loader = XMLFile(self.config.Resources.child("docs").child(name))
-            return document
+        filePath = self.config.Resources.child("docs").child(name)
+
+        if filePath.exists():
+            if name.endswith(".xhtml"):
+                set_response_header(request, HeaderName.contentType, ContentType.HTML)
+                return FileElement(filePath)
+
+        request.setResponseCode(http.NOT_FOUND)
+        set_response_header(request, HeaderName.contentType, ContentType.plain)
+        return "Not found."
 
 
     #
@@ -352,6 +359,21 @@ class IncidentManagementSystem(object):
     def daily_report(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
         return DailyReportElement(self)
+
+
+    #
+    # Baseline
+    #
+    @app.route("/baseline/<container>/<name>", methods=("GET",))
+    @http_sauce
+    def baseline(self, request, container, name):
+        # See http://baselinecss.com/
+        return self.cachedZipResource(
+            request,
+            "_baseline",
+            "http://baselinecss.com/download/baseline.zip",
+            ("baseline.0.5.3", "css", container, name)
+        )
 
 
     #
@@ -419,4 +441,30 @@ class IncidentManagementSystem(object):
 
         d = http_download(filePath, url)
         d.addCallback(lambda _: File(filePath.path))
+        return d
+
+
+    def cachedZipResource(self, request, name, url, segments):
+        archivePath = self.config.Resources.child("{0}.zip".format(name))
+
+        if archivePath.exists():
+            d = Deferred()
+            d.callback(None)
+        else:
+            d = http_download(archivePath, url)
+
+        def readFromArchive(_):
+            filePath = ZipArchive(archivePath.path)
+            for segment in segments:
+                filePath = filePath.child(segment)
+            return filePath.getContent()
+
+        def notFoundHandler(f):
+            f.trap(KeyError)
+            request.setResponseCode(http.NOT_FOUND)
+            set_response_header(request, HeaderName.contentType, ContentType.plain)
+            return "Not found."
+
+        d.addCallback(readFromArchive)
+        d.addErrback(notFoundHandler)
         return d
