@@ -195,8 +195,11 @@ class DailyReportElement(BaseElement):
                 for date in dates_from_incident(incident):
                     incidents_by_date.setdefault(date, set()).add(incident)
 
-                for incident_type in incident.incident_types:
-                    incidents_by_type.setdefault(incident_type, set()).add(incident)
+                if incident.incident_types:
+                    for incident_type in incident.incident_types:
+                        incidents_by_type.setdefault(incident_type, set()).add(incident)
+                else:
+                    incidents_by_type.setdefault("(unclassified)", set()).add(incident)
 
             self._incidents_by_date = incidents_by_date
             self._incidents_by_type = incidents_by_type
