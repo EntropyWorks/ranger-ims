@@ -26,6 +26,7 @@ __all__ = [
 
 from datetime import datetime, timedelta
 
+from twisted.python import log
 from twisted.web.template import Element, renderer
 from twisted.web.template import XMLFile
 
@@ -157,41 +158,97 @@ class DailyReportElement(BaseElement):
         BaseElement.__init__(self, ims, "report_daily", "Daily Report")
 
 
-    def incidents_by_date(self):
-        if not hasattr(self, "_incidents_by_date"):
+    def _index_incidents(self):
+        if not hasattr(self, "_incidents_by_date") or not hasattr(self, "_incidents_by_type"):
             storage = self.ims.storage
             incidents_by_date = {}
+            incidents_by_type = {}
+
+            def dates_from_incident(incident):
+                dates = set()
+
+                def add_date(dt, dates=dates):
+                    if dt is None:
+                        return
+
+                    if dt.hour < 12:
+                        dates.add(dt.date() - timedelta(days=1))
+                    else:
+                        dates.add(dt.date())
+
+                for entry in incident.report_entries:
+                    add_date(entry.created)
+
+                add_date(incident.created)
+                add_date(incident.dispatched)
+                add_date(incident.on_scene)
+                add_date(incident.closed)
+
+                return dates
 
             for number, etag in storage.list_incidents():
                 incident = storage.read_incident_with_number(number)
 
-                for entry in incident.report_entries:
-                    created = entry.created
-                    if created.hour < 12:
-                        date = created.date() - timedelta(days=1)
-                    else:
-                        date = created.date()
-
+                for date in dates_from_incident(incident):
                     incidents_by_date.setdefault(date, set()).add(incident)
 
-            self._incidents_by_date = incidents_by_date
+                for incident_type in incident.incident_types:
+                    incidents_by_type.setdefault(incident_type, set()).add(incident)
 
+            self._incidents_by_date = incidents_by_date
+            self._incidents_by_type = incidents_by_type
+
+
+    def incidents_by_date(self):
+        self._index_incidents()
         return self._incidents_by_date
+
+
+    def incidents_by_type(self):
+        self._index_incidents()
+        return self._incidents_by_type
 
 
     @renderer
     def columns(self, request, tag):
-        return to_json_text(["Type"] + [
-            date.strftime("%a %b %d")
-            for date in self.incidents_by_date()
-        ])
+        return to_json_text(
+            ["Type"] +
+            [
+                date.strftime("%a %m/%d")
+                for date in sorted(self.incidents_by_date())
+            ] +
+            ["Total"]
+        )
 
 
     @renderer
     def data(self, request, tag):
-        data = []
+        rows = []
 
-        return to_json_text(data)
+        incidents_by_type = self.incidents_by_type()
+        incidents_by_date = self.incidents_by_date()
+
+        for incident_type in sorted(incidents_by_type):
+            row = [incident_type]
+
+            seen = set()
+
+            for date in sorted(incidents_by_date):
+                incidents = incidents_by_type[incident_type] & incidents_by_date[date]
+                seen |= incidents
+                row.append("{0}".format(len(incidents)))
+                #row.append("{0} ({1})".format(len(incidents), ",".join((str(i.number) for i in incidents))))
+
+            row.append(len(incidents_by_type[incident_type]))
+
+            unseen = incidents_by_type[incident_type] - seen
+
+            if unseen:
+                log.msg("ERROR: No date for some {0} incidents (!?): {1}".format(incident_type, unseen))
+
+            rows.append(row)
+
+        return to_json_text(rows)
 
 
 
