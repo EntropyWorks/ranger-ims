@@ -358,12 +358,20 @@ class IncidentManagementSystem(object):
     @http_sauce
     def daily_report(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
-        return DailyReportElement(self)
+        return DailyReportElement(self, "report_daily")
+
+
+    @app.route("/charts/daily", methods=("GET",))
+    @http_sauce
+    def daily_chart(self, request):
+        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        return DailyReportElement(self, "chart_daily")
 
 
     #
     # Baseline
     #
+
     @app.route("/baseline/<container>/<name>", methods=("GET",))
     @http_sauce
     def baseline(self, request, container, name):
@@ -426,6 +434,23 @@ class IncidentManagementSystem(object):
         name = "tidy-desc.gif"
         url = "https://raw.github.com/nuxy/Tidy-Table/v1.4/images/arrow_desc.gif"
         return self.cachedResource(name, url)
+
+
+    #
+    # Flot
+    #
+
+    @app.route("/flot/<name>", methods=("GET",))
+    @http_sauce
+    def flot(self, request, name):
+        # See http://www.flotcharts.org/
+        which = "flot-0.8.1"
+        return self.cachedZipResource(
+            request,
+            "_{0}".format(which),
+            "http://www.flotcharts.org/downloads/{0}.zip".format(which),
+            ("flot", name)
+        )
 
 
     #

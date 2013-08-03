@@ -3,27 +3,33 @@
   <head>
     <title t:render="title" />
     <link t:render="icon" />
+<!--
     <link t:render="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="/tidy.css" />
+ -->
     <script type="text/javascript" src="/jquery.js" />
     <script type="text/javascript" src="/tidy.js" />
+    <script type="text/javascript" src="/flot/jquery.flot.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
         var tableColumns = <t:transparent t:render="tableColumns" />;
         var tableData = <t:transparent t:render="tableData" />;
 
-        $('#DailyStats').TidyTable(
-          {
-            // Options
-            enableCheckbox: false,
-            enableMenu    : false,
-          },
-          {
-            // Data
-            columnTitles: tableColumns,
-            columnValues: tableData,
+    //<![CDATA[
+
+        var chartData = [];
+        for (var i=0; i < tableData.length; i++) {
+          var sourceLabel = tableData[i][0];
+          var sourceData = tableData[i].slice(1);
+          for (var j=0; j < sourceData.length; j++) {
+            sourceData[j] = [j, sourceData[j]];
           }
-        );
+          chartData.push({label: sourceLabel, data: sourceData});
+        }
+
+        $.plot($("#LineGraph"), chartData, {});
+
+    //]]>
+
       });
     </script>
   </head>
@@ -32,7 +38,7 @@
 
     <div id="DailyStats" />
 
-    <div id="LineGraph" style="width:600px;height:300px" />
+    <div id="LineGraph" style="width:100%;height:600px" />
 
   </body>
 </html>

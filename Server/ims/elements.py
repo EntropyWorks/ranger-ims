@@ -181,8 +181,8 @@ class DispatchQueueElement(BaseElement):
 
 
 class DailyReportElement(BaseElement):
-    def __init__(self, ims):
-        BaseElement.__init__(self, ims, "report_daily", "Daily Report")
+    def __init__(self, ims, name):
+        BaseElement.__init__(self, ims, name, "Daily Report")
 
 
     def _index_incidents(self):
@@ -243,7 +243,7 @@ class DailyReportElement(BaseElement):
 
 
     @renderer
-    def columns(self, request, tag):
+    def tableColumns(self, request, tag):
         return to_json_text(
             ["Type"] +
             [
@@ -255,14 +255,26 @@ class DailyReportElement(BaseElement):
 
 
     @renderer
-    def data(self, request, tag):
+    def tableData(self, request, tag):
+        return self.data(labels=True, totals=True)
+
+
+    @renderer
+    def chartData(self, request, tag):
+        return self.data()
+
+
+    def data(self, labels=False, totals=False):
         rows = []
 
         incidents_by_type = self.incidents_by_type()
         incidents_by_date = self.incidents_by_date()
 
         for incident_type in sorted(incidents_by_type):
-            row = [incident_type]
+            if labels:
+                row = [incident_type]
+            else:
+                row = []
 
             seen = set()
 
@@ -281,14 +293,15 @@ class DailyReportElement(BaseElement):
 
             rows.append(row)
 
-        row = ["Total"]
-        seen = set()
-        for date in sorted(incidents_by_date):
-            incidents = incidents_by_date[date]
-            seen |= incidents
-            row.append(len(incidents))
-        row.append(len(seen))
-        rows.append(row)
+        if totals:
+            row = ["Total"]
+            seen = set()
+            for date in sorted(incidents_by_date):
+                incidents = incidents_by_date[date]
+                seen |= incidents
+                row.append(len(incidents))
+            row.append(len(seen))
+            rows.append(row)
 
         return to_json_text(rows)
 
