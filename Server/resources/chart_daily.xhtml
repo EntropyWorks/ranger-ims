@@ -8,7 +8,8 @@
  -->
     <script type="text/javascript" src="/jquery.js" />
     <script type="text/javascript" src="/tidy.js" />
-    <script type="text/javascript" src="/flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="/flot/jquery.flot.min.js"></script>
+    <!--<script type="text/javascript" src="/flot/jquery.flot.time.min.js"></script>-->
     <script type="text/javascript">
       $(document).ready(function() {
         var tableColumns = <t:transparent t:render="tableColumns" />;
@@ -23,10 +24,51 @@
           for (var j=0; j < sourceData.length; j++) {
             sourceData[j] = [j, sourceData[j]];
           }
-          chartData.push({label: sourceLabel, data: sourceData});
+
+          var chartYAxis = 1;
+          var lineWidth = 2;
+          if (sourceLabel == "Total") {
+            chartYAxis = 2;
+            lineWidth = 6;
+          }
+
+          chartData.push({
+            label: sourceLabel,
+            data: sourceData,
+            yaxis: chartYAxis,
+            lines: { lineWidth: lineWidth },
+          });
         }
 
-        $.plot($("#LineGraph"), chartData, {});
+        var xTicks = []
+        for (var i=0; i < tableColumns.length-1; i++) {
+          xTicks.push([i, tableColumns[i+1]]);
+        }
+
+        var chartOptions = {
+          xaxis: {
+            ticks: xTicks,
+            axisLabel: "Date",
+          },
+          yaxes: [
+            {
+              min: 0,
+              position: "left",
+              minTickSize: 1,
+              tickDecimals: 0,
+              axisLabel: "# Incidents",
+            },
+            {
+              min: 0,
+              position: "right",
+              minTickSize: 1,
+              tickDecimals: 0,
+              axisLabel: "# Incidents (Total)",
+            },
+          ]
+        };
+
+        $.plot($("#LineGraph"), chartData, chartOptions);
 
     //]]>
 
