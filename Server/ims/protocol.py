@@ -34,9 +34,11 @@ from ims.data import Incident, ReportEntry
 from ims.sauce import url_for, set_response_header
 from ims.sauce import http_sauce
 from ims.sauce import HeaderName, ContentType
-from ims.elements import FileElement, HomePageElement, DispatchQueueElement
-from ims.elements import DailyReportElement
-from ims.elements import incidents_from_query
+from ims.element.file import FileElement
+from ims.element.home import HomePageElement
+from ims.element.queue import DispatchQueueElement
+from ims.element.report import DailyReportElement
+from ims.element.util import incidents_from_query
 from ims.util import http_download
 
 

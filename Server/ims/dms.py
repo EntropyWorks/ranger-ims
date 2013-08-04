@@ -24,12 +24,36 @@ __all__ = [
 
 from time import time
 
+from twisted.python.constants import Names, NamedConstant
 from twisted.python import log
 from twisted.python.failure import Failure
 from twisted.internet.defer import succeed
 from twisted.enterprise import adbapi
 
 from ims.data import Ranger
+
+
+
+class DirtShifts (Names):
+    Grave     = NamedConstant()
+    Morning   = NamedConstant()
+    Afternoon = NamedConstant()
+    Swing     = NamedConstant()
+
+    @classmethod
+    def shiftForHourOfDay(cls, hour):
+        if hour >= 24:
+            raise ValueError("Hour may not be >= 24: {0!r}".format(hour))
+        elif hour >= 18:
+            return cls.Swing
+        elif hour >= 12:
+            return cls.Afternoon
+        elif hour >= 6:
+            return cls.Morning
+        elif hour >= 0:
+            return cls.Grave
+        else:
+            raise ValueError("Hour must be >= 0: {0!r}".format(hour))
 
 
 
