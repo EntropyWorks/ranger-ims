@@ -37,7 +37,8 @@ from ims.sauce import HeaderName, ContentType
 from ims.element.file import FileElement
 from ims.element.home import HomePageElement
 from ims.element.queue import DispatchQueueElement
-from ims.element.report import DailyReportElement
+from ims.element.report_daily import DailyReportElement
+from ims.element.report_shift import ShiftReportElement
 from ims.element.util import incidents_from_query
 from ims.util import http_download
 
@@ -368,6 +369,13 @@ class IncidentManagementSystem(object):
     def daily_chart(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
         return DailyReportElement(self, "chart_daily")
+
+
+    @app.route("/reports/shift", methods=("GET",))
+    @http_sauce
+    def shift_report(self, request):
+        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        return ShiftReportElement(self, "report_shift")
 
 
     #

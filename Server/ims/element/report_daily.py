@@ -15,20 +15,21 @@
 ##
 
 """
-Report Elements
+Daily Report Element
 """
 
 __all__ = [
     "DailyReportElement",
 ]
 
-from datetime import timedelta
+from datetime import timedelta as TimeDelta
 
 from twisted.python import log
 from twisted.web.template import renderer
 
 from ims.data import to_json_text
 from ims.element.base import BaseElement
+from ims.element.util import ignore_incident
 
 
 
@@ -37,7 +38,7 @@ class DailyReportElement(BaseElement):
         BaseElement.__init__(self, ims, name, "Daily Report")
 
 
-    def _index_incidents(self):
+    def _index_incidents(self, start_hour=12):
         if not hasattr(self, "_incidents_by_date") or not hasattr(self, "_incidents_by_type"):
             storage = self.ims.storage
             incidents_by_date = {}
@@ -50,8 +51,8 @@ class DailyReportElement(BaseElement):
                     if dt is None:
                         return
 
-                    if dt.hour < 12:
-                        dates.add(dt.date() - timedelta(days=1))
+                    if dt.hour < start_hour:
+                        dates.add(dt.date() - TimeDelta(days=1))
                     else:
                         dates.add(dt.date())
 
@@ -68,7 +69,7 @@ class DailyReportElement(BaseElement):
             for number, etag in storage.list_incidents():
                 incident = storage.read_incident_with_number(number)
 
-                if "Junk" in incident.incident_types:
+                if ignore_incident(incident):
                     continue
 
                 for date in dates_from_incident(incident):

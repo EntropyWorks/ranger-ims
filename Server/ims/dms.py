@@ -19,12 +19,16 @@ Duty Management System integration.
 """
 
 __all__ = [
+    "DirtShift",
+    "DMSError",
+    "DatabaseError",
     "DutyManagementSystem",
 ]
 
-from time import time
+from time import time as now
+from datetime import time as Time
 
-from twisted.python.constants import Names, NamedConstant
+from twisted.python.constants import Values, ValueConstant
 from twisted.python import log
 from twisted.python.failure import Failure
 from twisted.internet.defer import succeed
@@ -34,30 +38,39 @@ from ims.data import Ranger
 
 
 
-class DirtShifts (Names):
-    Grave     = NamedConstant()
-    Morning   = NamedConstant()
-    Afternoon = NamedConstant()
-    Swing     = NamedConstant()
+class DirtShift(Values):
+    length = 6
+
+    Grave     = ValueConstant(Time(hour=length*0))
+    Morning   = ValueConstant(Time(hour=length*1))
+    Afternoon = ValueConstant(Time(hour=length*2))
+    Swing     = ValueConstant(Time(hour=length*3))
 
     @classmethod
-    def shiftForHourOfDay(cls, hour):
-        if hour >= 24:
-            raise ValueError("Hour may not be >= 24: {0!r}".format(hour))
-        elif hour >= 18:
+    def shiftForTime(cls, time):
+        if time.hour >= 24:
+            raise ValueError("Hour may not be >= 24: {0!r}".format(time))
+        elif time.hour >= cls.Swing.value.hour:
             return cls.Swing
-        elif hour >= 12:
+        elif time.hour >= cls.Afternoon.value.hour:
             return cls.Afternoon
-        elif hour >= 6:
+        elif time.hour >= cls.Morning.value.hour:
             return cls.Morning
-        elif hour >= 0:
+        elif time.hour >= cls.Grave.value.hour:
             return cls.Grave
         else:
             raise ValueError("Hour must be >= 0: {0!r}".format(hour))
 
 
 
-class DatabaseError(Exception):
+class DMSError(Exception):
+    """
+    Duty Management System error.
+    """
+
+
+
+class DatabaseError(DMSError):
     """
     Database error.
     """
@@ -121,8 +134,7 @@ class DutyManagementSystem(object):
         # If we've cached the list of Rangers and the cache is older than
         # self.rangers_cache_interval, reload the list.
         #
-        now = time()
-        if now - self.rangers_updated > self.rangers_cache_interval:
+        if now() - self.rangers_updated > self.rangers_cache_interval:
             self.loadRangers()
 
         return succeed(self._rangers)
@@ -170,7 +182,7 @@ class DutyManagementSystem(object):
             ]
 
             self._rangers = rangers
-            self.rangers_updated = time()
+            self.rangers_updated = now()
 
             return self._rangers
 

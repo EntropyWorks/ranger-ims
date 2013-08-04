@@ -19,6 +19,7 @@ Element Utilities
 """
 
 __all__ = [
+    "ignore_incident",
     "incidents_from_query",
     "terms_from_query",
     "show_closed_from_query",
@@ -27,8 +28,17 @@ __all__ = [
     "query_value",
 ]
 
-from datetime import datetime, timedelta
+from datetime import datetime as DateTime, timedelta as TimeDelta
 
+incident_types_to_ignore = ("Junk")
+
+
+
+def ignore_incident(incident):
+    for incident_type_to_ignore in incident_types_to_ignore:
+        if incident_type_to_ignore in incident.incident_types:
+            return True
+    return False
 
 
 def incidents_from_query(ims, request):
@@ -82,7 +92,7 @@ def since_from_query(request):
     if not days:
         return None
 
-    return datetime.utcnow() - timedelta(days=days)
+    return DateTime.utcnow() - TimeDelta(days=days)
 
 
 def query_value(request, key, default, no_args_default=None):
