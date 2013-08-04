@@ -78,13 +78,6 @@ def set_accepts(request):
                 pass
     request.accepts = accepts
 
-    if ContentType.JSON.value in values:
-        request.agentClass = AgentClass.JSON
-    elif ContentType.HTML.value in values:
-        request.agentClass = AgentClass.HTML
-    else:
-        request.agentClass = None
-
 
 def http_sauce(f):
     @wraps(f)
@@ -148,9 +141,3 @@ class ContentType (Values):
     JSON  = ValueConstant("application/json")
     XHTML = ValueConstant("application/xhtml+xml")
     plain = ValueConstant("text/plain")
-
-
-
-class AgentClass (Names):
-    JSON = NamedConstant()
-    HTML = NamedConstant()
