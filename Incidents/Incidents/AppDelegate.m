@@ -251,6 +251,43 @@
 
 
 ////
+// Web Actions
+////
+
+
+- (void) openURLPathOnServer:(NSString *)path
+{
+    NSString *host = [NSString stringWithFormat:@"%@:%@", self.serverHostName, self.serverPort];
+    NSURL *url = [[NSURL alloc] initWithScheme:@"http" host:host path:path];
+    [[NSWorkspace sharedWorkspace] openURL:url];
+}
+
+
+- (IBAction) openWebDispatchQueue:(id)sender
+{
+    [self openURLPathOnServer:@"/queue"];
+}
+
+
+- (IBAction) openDailyReportTable:(id)sender
+{
+    [self openURLPathOnServer:@"/reports/daily"];
+}
+
+
+- (IBAction) openDailyReportGraph:(id)sender
+{
+    [self openURLPathOnServer:@"/charts/daily"];
+}
+
+
+- (IBAction) openHelp:(id)sender
+{
+    [self openURLPathOnServer:@"/"];
+}
+
+
+////
 // Debug Menu Actions
 ////
 
