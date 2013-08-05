@@ -25,6 +25,7 @@
 @protocol DataStoreDelegate <NSObject>
 
 
+- (void) dataStore:(id)dataStore didUpdateLinks:(NSArray *)links;
 - (void) dataStore:(id)dataStore willUpdateIncidentNumbered:(NSNumber *)number;
 - (void) dataStore:(id)dataStore didUpdateIncident:(Incident *)incident;
 - (void) dataStore:(id)dataStore didReplaceIncidentNumbered:(NSNumber *)oldNumber withIncidentNumbered:(NSNumber *)newNumber;

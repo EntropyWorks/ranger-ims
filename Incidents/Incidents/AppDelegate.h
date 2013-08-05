@@ -33,6 +33,7 @@
 
 
 - (NSURLCredential *) credentialForChallenge:(NSURLAuthenticationChallenge *)challenge;
+- (void) updateLinks:(NSArray *)links;
 
 
 @end

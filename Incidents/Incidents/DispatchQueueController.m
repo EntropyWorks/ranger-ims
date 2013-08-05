@@ -390,6 +390,13 @@ NSString *formattedDateTimeShort(NSDate *date);
 ////
 
 
+- (void) dataStore:(id)dataStore didUpdateLinks:(NSArray *)links
+{
+    AppDelegate *appDelegate = self.appDelegate;
+    [appDelegate updateLinks:links];
+}
+
+
 - (void) dataStore:(id)dataStore willUpdateIncidentNumbered:(NSNumber *)number;
 {
     // Hide the reload button…

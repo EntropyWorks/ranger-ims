@@ -34,8 +34,7 @@
 @property (strong,nonatomic) PreferencesController   *preferencesController;
 @property (strong,nonatomic) PasswordController      *passwordController;
 
-@property (weak) IBOutlet NSMenuItem *httpStoreMenuItem;
-@property (weak) IBOutlet NSMenuItem *fileStoreMenuItem;
+@property (weak) IBOutlet NSMenu *serverResourcesMenu;
 
 @property (strong,nonatomic) NSString *dataStoreType;
 
@@ -51,6 +50,12 @@
     if (self = [super init]) {
     }
     return self;
+}
+
+
+- (void) connectionInfoChanged
+{
+    self.dispatchQueueController = nil;
 }
 
 
@@ -75,7 +80,7 @@
         [defaults setObject:serverHostName forKey:@"IMSServerHostName"];
     }
 
-    self.dispatchQueueController = nil;
+    [self connectionInfoChanged];
 }
 
 
@@ -99,7 +104,7 @@
         [defaults setObject:serverPort forKey:@"IMSServerPort"];
     }
 
-    self.dispatchQueueController = nil;
+    [self connectionInfoChanged];
 }
 
 
@@ -149,7 +154,7 @@
 
 - (void) setDispatchQueueController:(DispatchQueueController *)dispatchQueueController
 {
-    if (! dispatchQueueController && _dispatchQueueController) {
+    if (_dispatchQueueController) {
         // Better clean house
         for (IncidentController *incidentController in _dispatchQueueController.incidentControllers) {
             [incidentController.window close];
@@ -161,32 +166,11 @@
 }
 
 
-- (void) setDataStoreType:(NSString *)type
-{
-    if (! [_dataStoreType isEqualToString:type]) {
-        NSMenuItem *httpStoreMenuItem = self.httpStoreMenuItem;
-        httpStoreMenuItem.state = NSOffState;
-
-        NSMenuItem *fileStoreMenuItem = self.fileStoreMenuItem;
-        fileStoreMenuItem.state = NSOffState;
-
-        if ([self.dataStoreType isEqualToString:@"HTTP"]) {
-            httpStoreMenuItem.state = NSOnState;
-        }
-        else if (! [self.dataStoreType isEqualToString:@"File"]) {
-            fileStoreMenuItem.state = NSOnState;
-        }
-
-        _dataStoreType = type;
-        self.dispatchQueueController = nil;
-    }
-}
-
-
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     self.dataStoreType = @"HTTP";
 
+    [self connectionInfoChanged];
     [self showDispatchQueue:self];
 }
 
@@ -263,21 +247,30 @@
 }
 
 
-- (IBAction) openWebDispatchQueue:(id)sender
+- (void) openLink:(NSMenuItem *)item
 {
-    [self openURLPathOnServer:@"/queue"];
+    NSDictionary *link = item.representedObject;
+    NSLog(@"Opening link: %@", link);
+
+    [self openURLPathOnServer:link[@"url"]];
 }
 
 
-- (IBAction) openDailyReportTable:(id)sender
+- (void) updateLinks:(NSArray *)links
 {
-    [self openURLPathOnServer:@"/reports/daily"];
-}
+    NSMenu *serverResourcesMenu = self.serverResourcesMenu;
 
+    [serverResourcesMenu removeAllItems];
 
-- (IBAction) openDailyReportGraph:(id)sender
-{
-    [self openURLPathOnServer:@"/charts/daily"];
+    for (NSDictionary *link in links) {
+        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:link[@"name"]
+                                                      action:NSSelectorFromString(@"openLink:")
+                                               keyEquivalent:@""];
+        item.target = self;
+        item.representedObject = link;
+
+        [serverResourcesMenu addItem:item];
+    }
 }
 
 
@@ -297,20 +290,6 @@
     if (self.dispatchQueueController) {
         performAlert(@"%@", self.dispatchQueueController.incidentControllers);
     }
-}
-
-
-- (IBAction) selectDataStore:(id)sender
-{
-    if (sender == self.httpStoreMenuItem) {
-        self.dataStoreType = @"HTTP";
-    }
-    else if (sender == self.fileStoreMenuItem) {
-        self.dataStoreType = @"File";
-    }
-
-    // This leads to crashing; need to wait for something first
-    //[self showDispatchQueue:self];
 }
 
 

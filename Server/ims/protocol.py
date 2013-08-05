@@ -66,9 +66,10 @@ class IncidentManagementSystem(object):
     @app.route("/ping/", methods=("GET",))
     @http_sauce
     def ping(self, request):
-        set_response_header(request, HeaderName.etag, "ack")
+        ack="ack"
+        set_response_header(request, HeaderName.etag, ack)
         set_response_header(request, HeaderName.contentType, ContentType.JSON)
-        return to_json_text("ack")
+        return to_json_text(ack)
 
 
     @app.route("/rangers/", methods=("GET",))
@@ -376,6 +377,26 @@ class IncidentManagementSystem(object):
     def shift_report(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
         return ShiftReportElement(self, "report_shift")
+
+
+    #
+    # Links
+    #
+
+    @app.route("/links/", methods=("GET",))
+    @http_sauce
+    def links(self, request):
+        #set_response_header(request, HeaderName.etag, ????)
+        set_response_header(request, HeaderName.contentType, ContentType.JSON)
+        return to_json_text([
+            { JSON.name.value: name, JSON.url.value: value }
+            for name, value in (
+                ( "Home page"                     , "/"              ),
+                ( "Dispatch Queue"                , "/queue"         ),
+                ( "Daily Incident Summary (Table)", "/reports/daily" ),
+                ( "Daily Incident Summary (Chart)", "/charts/daily"  ),
+            )
+        ])
 
 
     #

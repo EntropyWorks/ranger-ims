@@ -34,6 +34,7 @@
 @property (assign) BOOL serverAvailable;
 
 @property (strong) HTTPConnection *pingConnection;
+@property (strong) HTTPConnection *loadLinksConnection;
 @property (strong) HTTPConnection *loadIncidentNumbersConnection;
 @property (strong) HTTPConnection *loadIncidentConnection;
 @property (strong) HTTPConnection *loadRangersConnection;
@@ -262,6 +263,7 @@ static int nextTemporaryNumber = -1;
                     if ([jsonACK isEqualToString:@"ack"]) {
                         self.serverAvailable = YES;
                         NSLog(@"Ping request succeeded.");
+                        [self loadLinks];
                         [self loadIncidentTypes];
                         [self loadRangers];
                         [self loadIncidents];
@@ -312,6 +314,53 @@ static int nextTemporaryNumber = -1;
     [request setHTTPBody:[NSData data]];
 
     return [NSURLConnection connectionWithRequest:request delegate:self];
+}
+
+
+- (void) loadLinks {
+    @synchronized(self) {
+        if (self.serverAvailable) {
+            if (! self.loadLinksConnection.active) {
+                NSURL *url = [self.url URLByAppendingPathComponent:@"links/"];
+
+                HTTPResponseHandler onResponse = ^(HTTPConnection *connection) {
+                    if (connection != self.loadLinksConnection) {
+                        performAlert(@"Load links response from unknown connection!?");
+                        return;
+                    }
+
+                    //NSLog(@"Load links request completed.");
+
+                    NSError *error = nil;
+                    NSArray *jsonLinks = [NSJSONSerialization JSONObjectWithData:connection.responseData
+                                                                         options:0
+                                                                           error:&error];
+
+                    if (! jsonLinks || ! [jsonLinks isKindOfClass:[NSArray class]]) {
+                        NSLog(@"JSON object for links must be an array: %@", jsonLinks);
+                        return;
+                    }
+
+                    id <DataStoreDelegate> delegate = self.delegate;
+                    [delegate dataStore:self didUpdateLinks:jsonLinks];
+                };
+
+                HTTPErrorHandler onError = ^(HTTPConnection *connection, NSError *error) {
+                    if (connection != self.loadLinksConnection) {
+                        performAlert(@"Load links error from unknown connection!?");
+                        return;
+                    }
+
+                    performAlert(@"Load links request at %@ failed: %@", url, error);
+                };
+
+                self.loadLinksConnection = [HTTPConnection JSONQueryConnectionWithURL:url
+                                                                      responseHandler:onResponse
+                                                                authenticationHandler:self.authenticationHandler
+                                                                         errorHandler:onError];
+            }
+        }
+    }
 }
 
 
@@ -442,7 +491,7 @@ static int nextTemporaryNumber = -1;
                                 }
                                 self.allIncidentsByNumber[number] = incident;
 
-                                NSLog(@"Loaded: %@", incident);
+                                //NSLog(@"Loaded: %@", incident);
                                 [delegate dataStore:self didUpdateIncident:incident];
                             }
                             else {

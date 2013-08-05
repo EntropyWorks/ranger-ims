@@ -55,6 +55,8 @@ class JSON(Values):
     dispatched       = ValueConstant("dispatched")
     on_scene         = ValueConstant("on_scene")
     closed           = ValueConstant("closed")
+    name             = ValueConstant("name")
+    url              = ValueConstant("url")
 
     @classmethod
     def states(cls):
