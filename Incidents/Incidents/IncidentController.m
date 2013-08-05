@@ -742,7 +742,7 @@ static NSDateFormatter *entryDateFormatter = nil;
                     [locationAddressField selectText:self];
                 }
                 else if (addresses.count > 1) {
-                    // Put "?" in the address field so cause all completetions to trigger
+                    // Put "?" in the address field to cause all completetions to trigger
                     locationAddressField.stringValue = @"?";
 
                     // Select the address text
