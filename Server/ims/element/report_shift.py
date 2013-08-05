@@ -22,7 +22,6 @@ __all__ = [
     "ShiftReportElement",
 ]
 
-from functools import total_ordering
 from datetime import datetime as DateTime, timedelta as TimeDelta
 
 from twisted.python.constants import Names, NamedConstant
@@ -43,7 +42,6 @@ class Activity(Names):
 
 
 
-@total_ordering
 class Shift(object):
     @classmethod
     def from_datetime(cls, position, datetime):
@@ -104,8 +102,10 @@ class Shift(object):
         )
 
 
-    def __lt__(self, other):
-        return self.start < other.start
+    def __lt__(self, other): return self.start <  other.start
+    def __le__(self, other): return self.start <= other.start
+    def __gt__(self, other): return self.start > other.start
+    def __ge__(self, other): return self.start >= other.start
 
 
     def __str__(self):
