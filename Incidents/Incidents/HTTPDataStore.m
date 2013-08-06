@@ -262,7 +262,7 @@ static int nextTemporaryNumber = -1;
                 if (jsonACK) {
                     if ([jsonACK isEqualToString:@"ack"]) {
                         self.serverAvailable = YES;
-                        NSLog(@"Ping request succeeded.");
+                        //NSLog(@"Ping request succeeded.");
                         [self loadLinks];
                         [self loadIncidentTypes];
                         [self loadRangers];

@@ -293,7 +293,7 @@ static NSDateFormatter *entryDateFormatter = nil;
 {
     Incident *incident = self.incident;
 
-    NSLog(@"Displaying: %@", incident);
+    //NSLog(@"Displaying: %@", incident);
 
     NSString *summaryFromReport = incident.summaryFromReport;
 
