@@ -102,10 +102,10 @@ class Shift(object):
         )
 
 
-    def __lt__(self, other): return self.start <  other.start
-    def __le__(self, other): return self.start <= other.start
-    def __gt__(self, other): return self.start > other.start
-    def __ge__(self, other): return self.start >= other.start
+    def __lt__(self, other): return self.start <  other.start if isinstance(other, Shift) else NotImplemented
+    def __le__(self, other): return self.start <= other.start if isinstance(other, Shift) else NotImplemented
+    def __gt__(self, other): return self.start >  other.start if isinstance(other, Shift) else NotImplemented
+    def __ge__(self, other): return self.start >= other.start if isinstance(other, Shift) else NotImplemented
 
 
     def __str__(self):
@@ -151,6 +151,14 @@ class ShiftReportElement(BaseElement):
                     incidents_by_activity = incidents_by_shift.setdefault(shift, {})
                     incidents_by_activity.setdefault(Activity.closed, set()).add(incident)
 
+            open_incidents = set()
+            for shift in sorted(incidents_by_shift):
+                incidents_by_activity = incidents_by_shift[shift]
+                open_incidents |= incidents_by_activity[Activity.created]
+                open_incidents -= incidents_by_activity.get(Activity.closed, set())
+
+                incidents_by_activity[Activity.idle] = open_incidents
+
             self._incidents_by_shift = incidents_by_shift
 
 
@@ -160,14 +168,18 @@ class ShiftReportElement(BaseElement):
 
         output = []
         for shift in sorted(self._incidents_by_shift):
-            output.append("{0}".format(shift))
+            output.append(u"{0}".format(shift))
             incidents_by_activity = self._incidents_by_shift[shift]
 
             for activity in Activity.iterconstants():
-                output.append("  {0}".format(activity))
-                for incident in incidents_by_activity.get(activity, []):
-                    output.append("    {0}".format(incident))
+                output.append(u"  {0}".format(activity))
 
-            output.append("")
+                for incident in sorted(incidents_by_activity.get(activity, [])):
+                    number = incident.number
+                    summary = incident.summaryFromReport()
+                    output.append(u"    {0}: {1}".format(number, summary))
 
-        return "\n".join(output)
+                output.append(u"")
+            output.append(u"")
+
+        return u"\n".join(output)

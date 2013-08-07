@@ -30,8 +30,8 @@ __all__ = [
     "from_json_text",
 ]
 
-from json import dumps, load as from_json_io, loads as from_json_text
 from datetime import datetime
+from json import dumps, load as from_json_io, loads as from_json_text
 
 from twisted.python.constants import Values, ValueConstant
 
@@ -221,8 +221,8 @@ class Incident (object):
 
     def __str__(self):
         return (
-            "{self.number}: {self.summary}"
-            .format(self=self)
+            "{self.number}: {summary}"
+            .format(self=self, summary=self.summaryFromReport())
         )
 
 
@@ -277,6 +277,22 @@ class Incident (object):
             )
         else:
             return NotImplemented
+
+
+    def __lt__(self, other): return self.number <  other.number if isinstance(other, Incident) else NotImplemented
+    def __le__(self, other): return self.number <= other.number if isinstance(other, Incident) else NotImplemented
+    def __gt__(self, other): return self.number >  other.number if isinstance(other, Incident) else NotImplemented
+    def __ge__(self, other): return self.number >= other.number if isinstance(other, Incident) else NotImplemented
+
+
+    def summaryFromReport(self):
+        if self.summary:
+            return self.summary
+
+        for entry in self.report_entries:
+            return entry.text.split("\n")[0]
+
+        return ""
 
 
     def validate(self):
