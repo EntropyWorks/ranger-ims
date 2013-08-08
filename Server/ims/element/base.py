@@ -28,10 +28,11 @@ from ims.element.file import FileElement
 
 
 class BaseElement(FileElement):
-    def __init__(self, ims, name, title):
-        FileElement.__init__(self, ims.config.Resources.child("{0}.xhtml".format(name)))
+    def __init__(self, ims, template_name, title):
+        FileElement.__init__(self, ims.config.Resources.child("{0}.xhtml".format(template_name)))
 
         self.ims = ims
+        self.template_name = template_name
         self._title = title
 
 

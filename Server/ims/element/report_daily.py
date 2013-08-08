@@ -34,8 +34,8 @@ from ims.element.util import ignore_incident
 
 
 class DailyReportElement(BaseElement):
-    def __init__(self, ims, name):
-        BaseElement.__init__(self, ims, name, "Daily Report")
+    def __init__(self, ims, template_name):
+        BaseElement.__init__(self, ims, template_name, "Daily Report")
 
 
     def _index_incidents(self, start_hour=12):

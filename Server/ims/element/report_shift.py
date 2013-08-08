@@ -25,9 +25,8 @@ __all__ = [
 from datetime import datetime as DateTime, timedelta as TimeDelta
 
 from twisted.python.constants import Names, NamedConstant
-from twisted.web.template import renderer
+from twisted.web.template import renderer, tags
 
-#from ims.data import to_json_text
 from ims.dms import DirtShift
 from ims.element.base import BaseElement
 from ims.element.util import ignore_incident
@@ -126,11 +125,12 @@ class Shift(object):
 
 
 class ShiftReportElement(BaseElement):
-    def __init__(self, ims, name):
-        BaseElement.__init__(self, ims, name, "Shift Change Report")
+    def __init__(self, ims, template_name):
+        BaseElement.__init__(self, ims, template_name, "Shift Change Report")
 
 
-    def _index_incidents(self, number_of_shifts=3):
+    @property
+    def incidents_by_shift(self):
         if not hasattr(self, "_incidents_by_shift"):
             storage = self.ims.storage
             incidents_by_shift = {} #{"created":[], "closed":[]}
@@ -151,25 +151,34 @@ class ShiftReportElement(BaseElement):
                     incidents_by_activity = incidents_by_shift.setdefault(shift, {})
                     incidents_by_activity.setdefault(Activity.closed, set()).add(incident)
 
+                for entry in incident.report_entries:
+                    shift = Shift.from_datetime(DirtShift, entry.created)
+                    incidents_by_activity = incidents_by_shift.setdefault(shift, {})
+                    incidents_by_activity.setdefault(Activity.updated, set()).add(incident)
+
             open_incidents = set()
             for shift in sorted(incidents_by_shift):
                 incidents_by_activity = incidents_by_shift[shift]
-                open_incidents |= incidents_by_activity[Activity.created]
+
+                created_incidents = incidents_by_activity.get(Activity.created, set())
+
+                open_incidents |= created_incidents
                 open_incidents -= incidents_by_activity.get(Activity.closed, set())
 
-                incidents_by_activity[Activity.idle] = open_incidents
+                incidents_by_activity[Activity.idle] = open_incidents - created_incidents
 
             self._incidents_by_shift = incidents_by_shift
 
+        return self._incidents_by_shift
+
 
     @renderer
-    def debug(self, request, tag):
-        self._index_incidents()
-
+    def debug_activities(self, request, tag):
         output = []
-        for shift in sorted(self._incidents_by_shift):
+        for shift in sorted(self.incidents_by_shift):
             output.append(u"{0}".format(shift))
-            incidents_by_activity = self._incidents_by_shift[shift]
+            output.append(u"")
+            incidents_by_activity = self.incidents_by_shift[shift]
 
             for activity in Activity.iterconstants():
                 output.append(u"  {0}".format(activity))
@@ -180,6 +189,44 @@ class ShiftReportElement(BaseElement):
                     output.append(u"    {0}: {1}".format(number, summary))
 
                 output.append(u"")
+
             output.append(u"")
 
-        return u"\n".join(output)
+        return tags.pre(u"\n".join(output))
+
+
+    @renderer
+    def report(self, request, tag):
+        template_name = "{0}_shift".format(self.template_name)
+        shift_elements = []
+        for shift in sorted(self.incidents_by_shift):
+            element = ShiftElement(self.ims, template_name, shift)
+            shift_elements.append(element)
+
+        return tag(shift_elements)
+
+
+
+class ShiftElement(BaseElement):
+    def __init__(self, ims, template_name, shift):
+        BaseElement.__init__(self, ims, template_name, str(shift))
+        self.shift_data = shift
+
+
+    @renderer
+    def shift_id(self, request, tag):
+        return tag(id="shift_{0}".format(id(self.shift_data)))
+
+
+    @renderer
+    def activity(self, request, tag):
+        # Created and still open: (activity = created) - (activity = closed)
+
+        # Carried and updated: (activity = updated) - (activity = created)
+
+        # Carried and idle: (activity = idle)
+
+        # Carried and closed: (activity = closed) - (activity = created)
+
+        # Created and closed: (activity = created) & (activity = closed)
+        return "activity goes here"
