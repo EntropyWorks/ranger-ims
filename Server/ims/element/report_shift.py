@@ -42,7 +42,7 @@ class Activity(Names):
 
 class ShiftReportElement(BaseElement):
     def __init__(self, ims, template_name="report_shift"):
-        BaseElement.__init__(self, ims, template_name, "Shift Change Report")
+        BaseElement.__init__(self, ims, template_name, "Shift Summary")
 
 
     @property
