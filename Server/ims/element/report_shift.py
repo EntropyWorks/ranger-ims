@@ -49,7 +49,7 @@ class ShiftReportElement(BaseElement):
     def incidents_by_shift(self):
         if not hasattr(self, "_incidents_by_shift"):
             storage = self.ims.storage
-            incidents_by_shift = {} #{"created":[], "closed":[]}
+            incidents_by_shift = {}
 
             for number, etag in storage.list_incidents():
                 incident = storage.read_incident_with_number(number)
