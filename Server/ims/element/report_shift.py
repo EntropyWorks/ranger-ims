@@ -41,7 +41,7 @@ class Activity(Names):
 
 
 class ShiftReportElement(BaseElement):
-    def __init__(self, ims, template_name):
+    def __init__(self, ims, template_name="report_shift"):
         BaseElement.__init__(self, ims, template_name, "Shift Change Report")
 
 
@@ -113,10 +113,9 @@ class ShiftReportElement(BaseElement):
 
     @renderer
     def report(self, request, tag):
-        template_name = "{0}_shift".format(self.template_name)
         shift_elements = []
         for shift in sorted(self.incidents_by_shift):
-            element = ShiftElement(self.ims, template_name, shift)
+            element = ShiftElement(self.ims, shift)
             shift_elements.append(element)
 
         return tag(shift_elements)
@@ -124,7 +123,7 @@ class ShiftReportElement(BaseElement):
 
 
 class ShiftElement(BaseElement):
-    def __init__(self, ims, template_name, shift):
+    def __init__(self, ims, shift, template_name="shift"):
         BaseElement.__init__(self, ims, template_name, str(shift))
         self.shift_data = shift
 

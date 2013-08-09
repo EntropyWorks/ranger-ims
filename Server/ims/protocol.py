@@ -362,21 +362,21 @@ class IncidentManagementSystem(object):
     @http_sauce
     def daily_report(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
-        return DailyReportElement(self, "report_daily")
+        return DailyReportElement(self)
 
 
     @app.route("/charts/daily", methods=("GET",))
     @http_sauce
     def daily_chart(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
-        return DailyReportElement(self, "chart_daily")
+        return DailyReportElement(self, template_name="chart_daily")
 
 
     @app.route("/reports/shift", methods=("GET",))
     @http_sauce
     def shift_report(self, request):
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
-        return ShiftReportElement(self, "report_shift")
+        return ShiftReportElement(self)
 
 
     #
