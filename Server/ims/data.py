@@ -25,12 +25,13 @@ __all__ = [
     "ReportEntry",
     "Ranger",
     "Location",
+    "Shift",
     "to_json_text",
     "from_json_io",
     "from_json_text",
 ]
 
-from datetime import datetime
+from datetime import datetime as DateTime, timedelta as TimeDelta
 from json import dumps, load as from_json_io, loads as from_json_text
 
 from twisted.python.constants import Values, ValueConstant
@@ -128,7 +129,7 @@ class Incident (object):
             if not rfc3339:
                 return None
             else:
-                return datetime.strptime(rfc3339, rfc3339_date_time_format)
+                return DateTime.strptime(rfc3339, rfc3339_date_time_format)
 
         location = Location(
             name    = root.get(JSON.location_name.value   , None),
@@ -324,24 +325,24 @@ class Incident (object):
             for report_entry in self.report_entries:
                 report_entry.validate()
 
-        if self.created is not None and type(self.created) is not datetime:
+        if self.created is not None and type(self.created) is not DateTime:
             raise InvalidDataError(
-                "Incident created date must be a datetime, not {0!r}".format(self.created)
+                "Incident created date must be a DateTime, not {0!r}".format(self.created)
             )
 
-        if self.dispatched is not None and type(self.dispatched) is not datetime:
+        if self.dispatched is not None and type(self.dispatched) is not DateTime:
             raise InvalidDataError(
-                "Incident dispatched date must be a datetime, not {0!r}".format(self.dispatched)
+                "Incident dispatched date must be a DateTime, not {0!r}".format(self.dispatched)
             )
 
-        if self.on_scene is not None and type(self.on_scene) is not datetime:
+        if self.on_scene is not None and type(self.on_scene) is not DateTime:
             raise InvalidDataError(
-                "Incident on_scene date must be a datetime, not {0!r}".format(self.on_scene)
+                "Incident on_scene date must be a DateTime, not {0!r}".format(self.on_scene)
             )
 
-        if self.closed is not None and type(self.closed) is not datetime:
+        if self.closed is not None and type(self.closed) is not DateTime:
             raise InvalidDataError(
-                "Incident closed date must be a datetime, not {0!r}".format(self.closed)
+                "Incident closed date must be a DateTime, not {0!r}".format(self.closed)
             )
 
         if type(self.priority) is not int:
@@ -412,7 +413,7 @@ class ReportEntry(object):
 
     def __init__(self, author, text, created=None, system_entry=False):
         if created is None:
-            created = datetime.utcnow()
+            created = DateTime.utcnow()
 
         self.author       = author
         self.text         = text
@@ -474,9 +475,9 @@ class ReportEntry(object):
                 "Report entry text must be unicode, not {0!r}".format(self.text)
             )
 
-        if type(self.created) is not datetime:
+        if type(self.created) is not DateTime:
             raise InvalidDataError(
-                "Report entry created date must be a datetime, not {0!r}".format(self.created)
+                "Report entry created date must be a DateTime, not {0!r}".format(self.created)
             )
 
 
@@ -601,6 +602,89 @@ class Location(object):
                 "Location address must be unicode, not {0!r}".format(self.address)
             )
 
+
+
+class Shift(object):
+    @classmethod
+    def from_datetime(cls, position, datetime):
+        """
+        Create a shift from a datetime.
+
+        @param position: a L{Values} container corresponding to the
+            position the shift is for.
+
+        @param datetime: a L{DateTime} during the shift.
+        """
+        return cls(
+            position = position,
+            date = datetime.date(),
+            name = position.shiftForTime(datetime.time()),
+        )
+
+
+    def __init__(self, position, date, time=None, name=None):
+        """
+        One or both of C{time} and C{name} are required.  If both are
+        provided, they must match (meaning C{time == name.value}).
+
+        @param position: a L{Values} container corresponding to the
+            position the shift is for.
+
+        @param date: the L{Date} for the shift.
+
+        @param time: the L{Time} for the shift.
+
+        @param name: the L{ValueConstant} from the C{position}
+            container corresponding to the time of the shift.
+        """
+        if time is None:
+            if name is None:
+                raise ValueError("Both time and name may not be None.")
+            else:
+                time = name.value
+
+        if name is None:
+            name = position.lookupByValue(time)
+        elif name.value != time:
+            raise ValueError("time and name do not match: {0} != {1}".format(time, name))
+
+        self.position = position
+        self.start = DateTime(year=date.year, month=date.month, day=date.day, hour=time.hour)
+        self.name = name
+
+
+    def __hash__(self):
+        return hash((self.position, self.name))
+
+
+    def __eq__(self, other):
+        return (
+            self.position == other.position and
+            self.start == other.start
+        )
+
+
+    def __lt__(self, other): return self.start <  other.start if isinstance(other, Shift) else NotImplemented
+    def __le__(self, other): return self.start <= other.start if isinstance(other, Shift) else NotImplemented
+    def __gt__(self, other): return self.start >  other.start if isinstance(other, Shift) else NotImplemented
+    def __ge__(self, other): return self.start >= other.start if isinstance(other, Shift) else NotImplemented
+
+
+    def __str__(self):
+        return "{self.start} {self.name.name}".format(self=self)
+
+
+    @property
+    def end(self):
+        return (self.start.time() + TimeDelta(hours=self.position.length))
+
+
+    def next_shift(self):
+        return self.__class__(
+            position = self.position,
+            date = self.start.date(),
+            time = self.end,
+        )
 
 
 def to_json_text(obj):

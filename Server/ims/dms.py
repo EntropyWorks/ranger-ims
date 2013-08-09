@@ -59,7 +59,7 @@ class DirtShift(Values):
         elif time.hour >= cls.Grave.value.hour:
             return cls.Grave
         else:
-            raise ValueError("Hour must be >= 0: {0!r}".format(hour))
+            raise ValueError("Hour must be >= 0: {0!r}".format(time.hour))
 
 
 
