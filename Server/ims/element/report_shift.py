@@ -57,20 +57,18 @@ class ShiftReportElement(BaseElement):
                 if ignore_incident(incident):
                     continue
 
-                if incident.created:
-                    shift = Shift.from_datetime(DirtShift, incident.created)
-                    incidents_by_activity = incidents_by_shift.setdefault(shift, {})
-                    incidents_by_activity.setdefault(Activity.created, set()).add(incident)
+                def add(datetime, activity):
+                    if datetime is not None:
+                        shift = Shift.from_datetime(DirtShift, datetime)
+                        incidents_by_activity = incidents_by_shift.setdefault(shift, {})
+                        incidents_by_activity.setdefault(activity, set()).add(incident)
+                    
 
-                if incident.closed:
-                    shift = Shift.from_datetime(DirtShift, incident.closed)
-                    incidents_by_activity = incidents_by_shift.setdefault(shift, {})
-                    incidents_by_activity.setdefault(Activity.closed, set()).add(incident)
+                add(incident.created, Activity.created)
+                add(incident.closed, Activity.closed)
 
                 for entry in incident.report_entries:
-                    shift = Shift.from_datetime(DirtShift, entry.created)
-                    incidents_by_activity = incidents_by_shift.setdefault(shift, {})
-                    incidents_by_activity.setdefault(Activity.updated, set()).add(incident)
+                    add(entry.created, Activity.updated)
 
             open_incidents = set()
             for shift in sorted(incidents_by_shift):
