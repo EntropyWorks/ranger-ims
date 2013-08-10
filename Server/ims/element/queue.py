@@ -41,7 +41,7 @@ class DispatchQueueElement(BaseElement):
     @renderer
     def columns(self, request, tag):
         return to_json_text([
-            "Number",
+            "#",
             "Priority",
             "Created", "Dispatched", "On Scene", "Closed",
             "Rangers",

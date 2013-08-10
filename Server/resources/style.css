@@ -4,3 +4,12 @@ p, dd {
  text-indent: 1.5em;
  margin-bottom: 0.5em;
 }
+
+table.activity { table-layout:fixed; }
+th.number   { width:  4em; }
+th.priority { width:  4em; }
+th.state    { width:  4em; }
+th.rangers  { width:  8em; }
+th.location { width: 16em; }
+th.types    { width:  8em; }
+th.summary  {}

@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 from twisted.python.constants import Names, NamedConstant
-from twisted.web.template import renderer, tags
+from twisted.web.template import renderer, tags, XMLString
 
 from ims.dms import DirtShift
 from ims.data import Shift
@@ -97,7 +97,7 @@ class ShiftReportElement(BaseElement):
             for activity in Activity.iterconstants():
                 output.append(u"  {0}".format(activity))
 
-                for incident in sorted(incidents_by_activity.get(activity, [])):
+                for incident in sorted(incidents_by_activity.get(activity, set())):
                     number = incident.number
                     summary = incident.summaryFromReport()
                     output.append(u"    {0}: {1}".format(number, summary))
@@ -113,33 +113,83 @@ class ShiftReportElement(BaseElement):
     def report(self, request, tag):
         shift_elements = []
         for shift in sorted(self.incidents_by_shift):
-            element = ShiftElement(self.ims, shift)
+            element = ShiftActivityElement(self.ims, shift, self.incidents_by_shift[shift])
             shift_elements.append(element)
 
         return tag(shift_elements)
 
 
 
-class ShiftElement(BaseElement):
-    def __init__(self, ims, shift, template_name="shift"):
+class ShiftActivityElement(BaseElement):
+    def __init__(self, ims, shift, incidents_by_activity, template_name="shift"):
         BaseElement.__init__(self, ims, template_name, str(shift))
-        self.shift_data = shift
+        self.shift = shift
+        self.incidents_by_activity = incidents_by_activity
 
 
     @renderer
     def shift_id(self, request, tag):
-        return tag(id="shift_{0}".format(id(self.shift_data)))
+        return tag(id="shift:{0}".format(hash(self.shift)))
 
 
     @renderer
     def activity(self, request, tag):
-        # Created and still open: (activity = created) - (activity = closed)
+        created = self.incidents_by_activity.get(Activity.created, set())
+        updated = self.incidents_by_activity.get(Activity.updated, set())
+        idle    = self.incidents_by_activity.get(Activity.idle   , set())
+        closed  = self.incidents_by_activity.get(Activity.closed , set())
 
-        # Carried and updated: (activity = updated) - (activity = created)
+        def activity(title, incidents):
+            if incidents:
+                return ActivityElement(self.ims, title, self.shift, incidents)
+            else:
+                return ""
 
-        # Carried and idle: (activity = idle)
+        return tag(
+            activity("Created and open", created - closed),
+            activity("Carried and updated", updated - created),
+            activity("Carried and idle", idle),
+            activity("Carried and closed", closed - created),
+            activity("Opened and closed", created & closed),
+        )
 
-        # Carried and closed: (activity = closed) - (activity = created)
 
-        # Created and closed: (activity = created) & (activity = closed)
-        return "activity goes here"
+
+class ActivityElement(BaseElement):
+    def __init__(self, ims, title, shift, incidents, template_name="incidents"):
+        BaseElement.__init__(self, ims, template_name, title)
+        self.shift = shift
+        self.incidents = incidents
+
+
+    @renderer
+    def activity_id(self, request, tag):
+        return tag(id="activity:{0}:{1}".format(hash(self.shift), hash(self._title)))
+
+
+    @renderer
+    def incident_rows(self, request, tag):
+        def incidents_as_rows(incidents):
+            yield tags.tr(
+                tags.th(u"#"       , **{"class": "number"  }),
+                tags.th(u"Priority", **{"class": "priority"}),
+                tags.th(u"State"   , **{"class": "state"   }),
+                tags.th(u"Rangers" , **{"class": "rangers" }),
+                tags.th(u"Location", **{"class": "location"}),
+                tags.th(u"Types"   , **{"class": "types"   }),
+                tags.th(u"Summary" , **{"class": "summary" }),
+                **{"class": "incident"}
+            )
+            for incident in sorted(incidents):
+                yield tags.tr(
+                    tags.td(u"{0}".format(incident.number)), 
+                    tags.td(u"{0}".format(incident.priority)),  
+                    tags.td(u"{0}".format("-")),
+                    tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers))),
+                    tags.td(u"{0}".format(incident.location)),
+                    tags.td(u"{0}".format(", ".join(incident.incident_types))),
+                    tags.td(u"{0}".format(incident.summaryFromReport())),
+                    **{"class": "incident"}
+                )
+
+        return (incidents_as_rows(self.incidents))
