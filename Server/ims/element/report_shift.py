@@ -139,37 +139,15 @@ class ShiftActivityElement(BaseElement):
         idle    = self.incidents_by_activity.get(Activity.idle   , set())
         closed  = self.incidents_by_activity.get(Activity.closed , set())
 
-        def incidents_as_rows(incidents):
-            yield tags.tr(
-                tags.th(u"#"       , **{"class": "number"  }),
-                tags.th(u"Priority", **{"class": "priority"}),
-                tags.th(u"Rangers" , **{"class": "rangers" }),
-                tags.th(u"Location", **{"class": "location"}),
-                tags.th(u"Types"   , **{"class": "types"   }),
-                tags.th(u"Summary" , **{"class": "summary" }),
-                **{"class": "incident"}
-            )
-            for incident in sorted(incidents):
-                yield tags.tr(
-                    tags.td(u"{0}".format(incident.number)), 
-                    tags.td(u"{0}".format(incident.priority)),  
-                    tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers))),
-                    tags.td(u"{0}".format(incident.location)),
-                    tags.td(u"{0}".format(", ".join(incident.incident_types))),
-                    tags.td(u"{0}".format(incident.summaryFromReport())),
-                    **{"class": "incident"}
+        def activity(caption, incidents):
+            if incidents:
+                return incidents_as_table(
+                    incidents,
+                    caption=caption,
+                    id="activity:{0}:{1}".format(hash(self.shift), hash(caption)),
                 )
-
-        def activity(title, incidents):
-            if not incidents:
+            else:
                 return ""
-
-            return tags.table(
-                tags.caption(title, **{"class": "activity"}),
-                incidents_as_rows(incidents),
-                id="activity:{0}:{1}".format(hash(self.shift), hash(title)),
-                **{"class": "activity"}
-            )
 
         return tag(
             activity("Created and open", created - closed),
@@ -179,3 +157,43 @@ class ShiftActivityElement(BaseElement):
             activity("Opened and closed", created & closed),
             tags.hr(),
         )
+
+
+
+def incidents_as_table(incidents, caption=None, id=None):
+    if caption:
+        captionElement = tags.caption(caption, **{"class": "activity"})
+    else:
+        captionElement = ""
+
+    def incidents_as_rows(incidents):
+        attrs = {"class": "incident"}
+        yield tags.tr(
+            tags.th(u"#"       , **{"class": "number"  }),
+            tags.th(u"Priority", **{"class": "priority"}),
+            tags.th(u"Rangers" , **{"class": "rangers" }),
+            tags.th(u"Location", **{"class": "location"}),
+            tags.th(u"Types"   , **{"class": "types"   }),
+            tags.th(u"Summary" , **{"class": "summary" }),
+            **attrs
+        )
+        for incident in sorted(incidents):
+            yield tags.tr(
+                tags.td(u"{0}".format(incident.number)), 
+                tags.td(u"{0}".format(incident.priority)),  
+                tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers))),
+                tags.td(u"{0}".format(incident.location)),
+                tags.td(u"{0}".format(", ".join(incident.incident_types))),
+                tags.td(u"{0}".format(incident.summaryFromReport())),
+                **attrs
+            )
+
+    attrs = {"class": "activity"}
+    if id is not None:
+        attrs["id"] = id
+
+    return tags.table(
+        captionElement,
+        incidents_as_rows(incidents),
+        **attrs
+    )
