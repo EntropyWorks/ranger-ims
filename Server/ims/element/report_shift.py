@@ -139,41 +139,10 @@ class ShiftActivityElement(BaseElement):
         idle    = self.incidents_by_activity.get(Activity.idle   , set())
         closed  = self.incidents_by_activity.get(Activity.closed , set())
 
-        def activity(title, incidents):
-            if incidents:
-                return ActivityElement(self.ims, title, self.shift, incidents)
-            else:
-                return ""
-
-        return tag(
-            activity("Created and open", created - closed),
-            activity("Carried and updated", updated - created),
-            activity("Carried and idle", idle),
-            activity("Carried and closed", closed - created),
-            activity("Opened and closed", created & closed),
-        )
-
-
-
-class ActivityElement(BaseElement):
-    def __init__(self, ims, title, shift, incidents, template_name="incidents"):
-        BaseElement.__init__(self, ims, template_name, title)
-        self.shift = shift
-        self.incidents = incidents
-
-
-    @renderer
-    def activity_id(self, request, tag):
-        return tag(id="activity:{0}:{1}".format(hash(self.shift), hash(self._title)))
-
-
-    @renderer
-    def incident_rows(self, request, tag):
         def incidents_as_rows(incidents):
             yield tags.tr(
                 tags.th(u"#"       , **{"class": "number"  }),
                 tags.th(u"Priority", **{"class": "priority"}),
-                tags.th(u"State"   , **{"class": "state"   }),
                 tags.th(u"Rangers" , **{"class": "rangers" }),
                 tags.th(u"Location", **{"class": "location"}),
                 tags.th(u"Types"   , **{"class": "types"   }),
@@ -184,7 +153,6 @@ class ActivityElement(BaseElement):
                 yield tags.tr(
                     tags.td(u"{0}".format(incident.number)), 
                     tags.td(u"{0}".format(incident.priority)),  
-                    tags.td(u"{0}".format("-")),
                     tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers))),
                     tags.td(u"{0}".format(incident.location)),
                     tags.td(u"{0}".format(", ".join(incident.incident_types))),
@@ -192,4 +160,22 @@ class ActivityElement(BaseElement):
                     **{"class": "incident"}
                 )
 
-        return (incidents_as_rows(self.incidents))
+        def activity(title, incidents):
+            if not incidents:
+                return ""
+
+            return tags.table(
+                tags.caption(title, **{"class": "activity"}),
+                incidents_as_rows(incidents),
+                id="activity:{0}:{1}".format(hash(self.shift), hash(title)),
+                **{"class": "activity"}
+            )
+
+        return tag(
+            activity("Created and open", created - closed),
+            activity("Carried and updated", updated - created),
+            activity("Carried and idle", idle),
+            activity("Carried and closed", closed - created),
+            activity("Opened and closed", created & closed),
+            tags.hr(),
+        )
