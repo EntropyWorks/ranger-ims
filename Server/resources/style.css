@@ -5,8 +5,12 @@ p, dd {
  margin-bottom: 0.5em;
 }
 
-table.activity { table-layout: fixed; }
+table.activity { table-layout: fixed; margin-bottom: 20pt; }
 caption.activity { text-align: center; margin-bottom: 4pt; }
+tbody.activity { border: 1px solid black; }
+
+tr.incident:hover { background-color: #FFFF00; }
+
 th.number   { width:  4em; }
 th.priority { width:  4em; }
 th.state    { width:  4em; }

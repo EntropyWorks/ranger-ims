@@ -29,7 +29,6 @@ __all__ = [
 from functools import wraps
 
 from twisted.python import log
-from twisted.python.constants import Names, NamedConstant
 from twisted.python.constants import Values, ValueConstant
 from twisted.web import http
 

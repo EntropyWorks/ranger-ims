@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 from twisted.python.constants import Names, NamedConstant
-from twisted.web.template import renderer, tags, XMLString
+from twisted.web.template import renderer, tags
 
 from ims.dms import DirtShift
 from ims.data import Shift
@@ -170,7 +170,6 @@ class ShiftActivityElement(BaseElement):
             activity("Carried and idle", idle),
             activity("Carried and closed", closed - created),
             activity("Opened and closed", created & closed),
-            tags.hr(),
         )
 
 
@@ -182,33 +181,43 @@ def incidents_as_table(incidents, caption=None, id=None):
         captionElement = ""
 
     def incidents_as_rows(incidents):
-        attrs = {"class": "incident"}
+        attrs_incident = {"class": "incident"}
+        attrs_number   = {"class": "number"  }
+        attrs_priority = {"class": "priority"}
+        attrs_rangers  = {"class": "rangers" }
+        attrs_location = {"class": "location"}
+        attrs_types    = {"class": "types"   }
+        attrs_summary  = {"class": "summary" }
+        
         yield tags.tr(
-            tags.th(u"#"       , **{"class": "number"  }),
-            tags.th(u"Priority", **{"class": "priority"}),
-            tags.th(u"Rangers" , **{"class": "rangers" }),
-            tags.th(u"Location", **{"class": "location"}),
-            tags.th(u"Types"   , **{"class": "types"   }),
-            tags.th(u"Summary" , **{"class": "summary" }),
-            **attrs
+            tags.th(u"#"       , **attrs_number  ),
+            tags.th(u"Priority", **attrs_priority),
+            tags.th(u"Rangers" , **attrs_rangers ),
+            tags.th(u"Location", **attrs_location),
+            tags.th(u"Types"   , **attrs_types   ),
+            tags.th(u"Summary" , **attrs_summary ),
+            **attrs_incident
         )
         for incident in sorted(incidents):
             yield tags.tr(
-                tags.td(u"{0}".format(incident.number)), 
-                tags.td(u"{0}".format(incident.priority)),  
-                tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers))),
-                tags.td(u"{0}".format(incident.location)),
-                tags.td(u"{0}".format(", ".join(incident.incident_types))),
-                tags.td(u"{0}".format(incident.summaryFromReport())),
-                **attrs
+                tags.td(u"{0}".format(incident.number), **attrs_number), 
+                tags.td(u"{0}".format(incident.priority), **attrs_priority),  
+                tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers)), **attrs_rangers),
+                tags.td(u"{0}".format(incident.location), **attrs_location),
+                tags.td(u"{0}".format(", ".join(incident.incident_types)), **attrs_types),
+                tags.td(u"{0}".format(incident.summaryFromReport()), **attrs_summary),
+                **attrs_incident
             )
 
-    attrs = {"class": "activity"}
+    attrs_activity = {"class": "activity"}
     if id is not None:
-        attrs["id"] = id
+        attrs_activity["id"] = id
 
     return tags.table(
         captionElement,
-        incidents_as_rows(incidents),
-        **attrs
+        tags.tbody(
+            incidents_as_rows(incidents),
+            **attrs_activity
+        ),
+        **attrs_activity
     )
