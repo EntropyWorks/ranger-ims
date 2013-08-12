@@ -8,12 +8,16 @@
   <body>
     <h1 t:render="title" />
 
-<!--
-    <div t:render="debug_activities" />
-
-    <hr />
- -->
-
+    <form action="" method="get">
+      <label>
+        <select name="num_shifts" onclick="this.form.submit();">
+          <option value="1" t:render="num_shifts_selected">Show 1 shift</option>
+          <option value="2" t:render="num_shifts_selected">Show 2 shifts</option>
+          <option value="3" t:render="num_shifts_selected">Show 3 shifts</option>
+          <option value="0" t:render="num_shifts_selected">Show all shifts</option>
+        </select>
+      </label>
+    </form>
     <div t:render="report" />
 
   </body>

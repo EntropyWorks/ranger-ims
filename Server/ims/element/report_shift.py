@@ -29,6 +29,7 @@ from ims.dms import DirtShift
 from ims.data import Shift
 from ims.element.base import BaseElement
 from ims.element.util import ignore_incident
+from ims.element.util import num_shifts_from_query
 
 
 
@@ -112,11 +113,25 @@ class ShiftReportElement(BaseElement):
     @renderer
     def report(self, request, tag):
         shift_elements = []
-        for shift in sorted(self.incidents_by_shift):
+        max = int(num_shifts_from_query(request))
+        count = 0
+        for shift in sorted(self.incidents_by_shift, reverse=True):
+            if max:
+                count += 1
+                if count > max:
+                    break
             element = ShiftActivityElement(self.ims, shift, self.incidents_by_shift[shift])
             shift_elements.append(element)
 
         return tag(shift_elements)
+
+
+    @renderer
+    def num_shifts_selected(self, request, tag):
+        if tag.attributes["value"] == num_shifts_from_query(request):
+            return tag(selected="")
+        else:
+            return tag;
 
 
 

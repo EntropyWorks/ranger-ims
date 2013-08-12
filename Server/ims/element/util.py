@@ -95,6 +95,10 @@ def since_from_query(request):
     return DateTime.utcnow() - TimeDelta(days=days)
 
 
+def num_shifts_from_query(request):
+    return query_value(request, "num_shifts", "1")
+
+
 def query_value(request, key, default, no_args_default=None):
     attr_name = "ims_qv_{0}".format(key)
 
