@@ -671,7 +671,7 @@ class Shift(object):
 
 
     def __str__(self):
-        return "{self.start} {self.name.name}".format(self=self)
+        return "{self.start:%y-%m-%d %a} {self.name.name}".format(self=self)
 
 
     @property
