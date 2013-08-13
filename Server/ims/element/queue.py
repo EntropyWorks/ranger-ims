@@ -124,6 +124,11 @@ class DispatchQueueElement(BaseElement):
 
 
     @renderer
+    def since_days_ago_value(self, request, tag):
+        return tag(value=since_days_ago_from_query(request))
+
+
+    @renderer
     def since_days_ago_selected(self, request, tag):
         if tag.attributes["value"] == since_days_ago_from_query(request):
             return tag(selected="")
