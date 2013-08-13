@@ -22,6 +22,8 @@ __all__ = [
     "IncidentManagementSystem",
 ]
 
+from datetime import datetime as DateTime
+
 from twisted.python.zippath import ZipArchive
 from twisted.internet.defer import Deferred
 from twisted.web import http
@@ -204,6 +206,18 @@ class IncidentManagementSystem(object):
             elif key is JSON.incident_types:
                 if edits.incident_types is not None:
                     log_edit_set(key, *diff_set(key, incident.incident_types, edits.incident_types))
+
+                    if "Junk" in (frozenset(edits.incident_types) - frozenset(incident.incident_types)):
+                        # Junk was added as an incident type; let's close.
+                        now = DateTime.now()
+                        for key in (JSON.created, JSON.dispatched, JSON.on_scene, JSON.closed):
+                            attr_name = key.name
+                            attr_value = getattr(edits, attr_name)
+
+                            if attr_value is None:
+                                log_edit_value(key, getattr(incident, attr_name), now)
+                                setattr(incident, attr_name, now)
+
                     incident.incident_types = edits.incident_types
             else:
                 attr_name = key.name
