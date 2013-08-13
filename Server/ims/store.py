@@ -134,7 +134,7 @@ class Storage(object):
 
 
     def search_incidents(self, terms=(), show_closed=False, since=None, until=None):
-        log.msg("Searching for {0!r}, closed={1}".format(terms, show_closed))
+        #log.msg("Searching for {0!r}, closed={1}".format(terms, show_closed))
 
         #
         # Brute force implementation for now.
