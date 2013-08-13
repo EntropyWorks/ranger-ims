@@ -181,6 +181,18 @@ class IncidentManagementSystem(object):
             if removed:
                 system_messages.append(u"Removed from {0}: {1}".format(JSON.describe(key), ", ".join(removed)))
 
+        def close_incident(incident=incident, edits=edits):
+            now = DateTime.now()
+            for key in (JSON.created, JSON.dispatched, JSON.on_scene, JSON.closed):
+                attr_name = key.name
+
+                if (
+                    getattr(incident, attr_name) is None and
+                    getattr(edits   , attr_name) is None
+                ):
+                    log_edit_value(key, getattr(incident, attr_name), now)
+                    setattr(incident, attr_name, now)
+
         for key in edits_json.keys():
             key = JSON.lookupByValue(key)
 
@@ -209,16 +221,7 @@ class IncidentManagementSystem(object):
 
                     if "Junk" in (frozenset(edits.incident_types) - frozenset(incident.incident_types)):
                         # Junk was added as an incident type; let's close.
-                        now = DateTime.now()
-                        for key in (JSON.created, JSON.dispatched, JSON.on_scene, JSON.closed):
-                            attr_name = key.name
-
-                            if (
-                                getattr(incident, attr_name) is None and
-                                getattr(edits   , attr_name) is None
-                            ):
-                                log_edit_value(key, getattr(incident, attr_name), now)
-                                setattr(incident, attr_name, now)
+                        close_incident()
 
                     incident.incident_types = edits.incident_types
             else:
