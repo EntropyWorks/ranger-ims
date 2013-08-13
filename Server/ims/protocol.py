@@ -212,9 +212,11 @@ class IncidentManagementSystem(object):
                         now = DateTime.now()
                         for key in (JSON.created, JSON.dispatched, JSON.on_scene, JSON.closed):
                             attr_name = key.name
-                            attr_value = getattr(edits, attr_name)
 
-                            if attr_value is None:
+                            if (
+                                getattr(incident, attr_name) is None and
+                                getattr(edits   , attr_name) is None
+                            ):
                                 log_edit_value(key, getattr(incident, attr_name), now)
                                 setattr(incident, attr_name, now)
 
