@@ -422,9 +422,15 @@ class ReportEntry(object):
 
 
     def __str__(self):
+        if self.system_entry:
+            prefix = "*"
+        else:
+            prefix = ""
+
         return (
-            "{self.author}@{self.created}: {self.text}"
-            .format(self=self)
+            u"{prefix}{self.author}@{self.created}: {self.text}"
+            .format(self=self, prefix=prefix)
+            .encode("utf-8")
         )
 
 
