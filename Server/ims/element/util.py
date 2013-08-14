@@ -19,12 +19,15 @@ Element Utilities
 """
 
 __all__ = [
+    "incident_types_to_ignore",
     "ignore_incident",
+    "ignore_entry",
     "incidents_from_query",
     "terms_from_query",
     "show_closed_from_query",
     "since_days_ago_from_query",
     "since_from_query",
+    "num_shifts_from_query",
     "query_value",
 ]
 
