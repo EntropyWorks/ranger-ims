@@ -30,14 +30,13 @@ __all__ = [
 
 from datetime import datetime as DateTime, timedelta as TimeDelta
 
-incident_types_to_ignore = ("Junk")
+incident_types_to_ignore = set([u"Junk"])
 
 
 
 def ignore_incident(incident):
-    for incident_type_to_ignore in incident_types_to_ignore:
-        if incident_type_to_ignore in incident.incident_types:
-            return True
+    if incident_types_to_ignore & set(incident.incident_types):
+        return True
     return False
 
 
