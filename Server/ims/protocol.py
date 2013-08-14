@@ -65,6 +65,7 @@ class IncidentManagementSystem(object):
     # JSON endpoints
     #
 
+    @app.route("/ping", methods=("GET",))
     @app.route("/ping/", methods=("GET",))
     @http_sauce
     def ping(self, request):
@@ -74,6 +75,7 @@ class IncidentManagementSystem(object):
         return to_json_text(ack)
 
 
+    @app.route("/rangers", methods=("GET",))
     @app.route("/rangers/", methods=("GET",))
     @http_sauce
     def list_rangers(self, request):
@@ -94,6 +96,7 @@ class IncidentManagementSystem(object):
 
         return d              
 
+    @app.route("/incident_types", methods=("GET",))
     @app.route("/incident_types/", methods=("GET",))
     @http_sauce
     def list_incident_types(self, request):
@@ -102,6 +105,7 @@ class IncidentManagementSystem(object):
         return self.config.IncidentTypesJSON
 
 
+    @app.route("/incidents", methods=("GET",))
     @app.route("/incidents/", methods=("GET",))
     @http_sauce
     def list_incidents(self, request):
@@ -322,6 +326,7 @@ class IncidentManagementSystem(object):
     #
 
     @app.route("/queue", methods=("GET",))
+    @app.route("/queue/", methods=("GET",))
     @http_sauce
     def dispatchQueue(self, request):
         if not request.args:
@@ -335,7 +340,8 @@ class IncidentManagementSystem(object):
     # Resources
     #
 
-    @app.route("/resources/", branch=True)
+    @app.route("/resources", methods=("GET",))
+    @app.route("/resources/", methods=("GET",), branch=True)
     @http_sauce
     def favicon(self, request):
         return File(self.config.Resources.path)
@@ -352,6 +358,7 @@ class IncidentManagementSystem(object):
         return HomePageElement(self)
 
 
+    @app.route("/docs", methods=("GET",))
     @app.route("/docs/", methods=("GET",))
     @http_sauce
     def doc_index(self, request):
@@ -402,6 +409,7 @@ class IncidentManagementSystem(object):
     # Links
     #
 
+    @app.route("/links", methods=("GET",))
     @app.route("/links/", methods=("GET",))
     @http_sauce
     def links(self, request):
