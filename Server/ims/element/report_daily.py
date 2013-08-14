@@ -27,7 +27,7 @@ from datetime import timedelta as TimeDelta
 from twisted.python import log
 from twisted.web.template import renderer
 
-from ims.data import to_json_text
+from ims.data import to_json_text, IncidentType
 from ims.element.base import BaseElement
 from ims.element.util import ignore_incident, ignore_entry
 
@@ -85,7 +85,7 @@ class DailyReportElement(BaseElement):
                     for incident_type in incident.incident_types:
                         incidents_by_type.setdefault(incident_type, set()).add(incident)
                 else:
-                    incidents_by_type.setdefault("(unclassified)", set()).add(incident)
+                    incidents_by_type.setdefault(None, set()).add(incident)
 
             self._incidents_by_date = incidents_by_date
             self._incidents_by_type = incidents_by_type
@@ -130,8 +130,14 @@ class DailyReportElement(BaseElement):
         incidents_by_date = self.incidents_by_date()
 
         for incident_type in sorted(incidents_by_type):
+            if incident_type in set((IncidentType.Admin.value,)):
+                continue
+
             if labels:
-                row = [incident_type]
+                if incident_type is None:
+                    row = ["(unclassified)"]
+                else:
+                    row = [incident_type]
             else:
                 row = []
 
