@@ -28,7 +28,7 @@ from twisted.web.template import renderer, tags
 from ims.dms import DirtShift
 from ims.data import Shift
 from ims.element.base import BaseElement
-from ims.element.util import ignore_incident
+from ims.element.util import ignore_incident, ignore_entry
 from ims.element.util import num_shifts_from_query
 
 
@@ -65,11 +65,14 @@ class ShiftReportElement(BaseElement):
                         incidents_by_activity.setdefault(activity, set()).add(incident)
                     
 
-                add(incident.created, Activity.created)
-                add(incident.closed, Activity.closed)
+                add(incident.created   , Activity.created)
+                add(incident.dispatched, Activity.updated)
+                add(incident.on_scene  , Activity.updated)
+                add(incident.closed    , Activity.closed)
 
                 for entry in incident.report_entries:
-                    add(entry.created, Activity.updated)
+                    if not ignore_entry(entry):
+                        add(entry.created, Activity.updated)
 
             open_incidents = set()
             for shift in sorted(incidents_by_shift):
@@ -166,7 +169,7 @@ class ShiftActivityElement(BaseElement):
 
         return tag(
             activity("Created and open", created - closed),
-            activity("Carried and updated", updated - created),
+            activity("Carried and updated", updated - created - closed),
             activity("Carried and idle", idle),
             activity("Carried and closed", closed - created),
             activity("Opened and closed", created & closed),

@@ -29,7 +29,7 @@ from twisted.web.template import renderer
 
 from ims.data import to_json_text
 from ims.element.base import BaseElement
-from ims.element.util import ignore_incident
+from ims.element.util import ignore_incident, ignore_entry
 
 
 
@@ -47,9 +47,14 @@ class DailyReportElement(BaseElement):
             def dates_from_incident(incident):
                 dates = set()
 
-                def add_date(dt, dates=dates):
+                def add_date(dt, dates=dates, incident=incident):
                     if dt is None:
                         return
+
+                    from datetime import date as Date
+                    if dt.date() == Date.today():
+                        print "*"*80
+                        print dt.date(), "->", incident
 
                     if dt.hour < start_hour:
                         dates.add(dt.date() - TimeDelta(days=1))
@@ -57,12 +62,13 @@ class DailyReportElement(BaseElement):
                         dates.add(dt.date())
 
                 for entry in incident.report_entries:
-                    add_date(entry.created)
+                    if not ignore_entry(entry):
+                        add_date(entry.created)
 
                 add_date(incident.created)
-                add_date(incident.dispatched)
-                add_date(incident.on_scene)
-                add_date(incident.closed)
+                #add_date(incident.dispatched)
+                #add_date(incident.on_scene)
+                #add_date(incident.closed)
 
                 return dates
 

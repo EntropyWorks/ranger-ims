@@ -41,6 +41,12 @@ def ignore_incident(incident):
     return False
 
 
+def ignore_entry(entry):
+    if entry.system_entry:
+        return True
+    return False
+
+
 def incidents_from_query(ims, request):
     if not hasattr(request, "ims_incidents"):
         if request.args:
