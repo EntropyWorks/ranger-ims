@@ -89,7 +89,7 @@ class IncidentType(Values):
     Non-exhautive set of constants for incident types; only incident types
     known to the software need to be here.
     """
-    Admin = ValueConstant(u"Values")
+    Admin = ValueConstant(u"Admin")
     Junk  = ValueConstant(u"Junk")
 
 
