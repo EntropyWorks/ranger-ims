@@ -32,7 +32,7 @@ from twisted.web.static import File
 from klein import Klein
 
 from ims.data import JSON, to_json_text, from_json_io
-from ims.data import Incident, ReportEntry
+from ims.data import Incident, ReportEntry, IncidentType
 from ims.sauce import url_for, set_response_header
 from ims.sauce import http_sauce
 from ims.sauce import HeaderName, ContentType
@@ -219,7 +219,7 @@ class IncidentManagementSystem(object):
                 if edits.incident_types is not None:
                     log_edit_set(key, *diff_set(key, incident.incident_types, edits.incident_types))
 
-                    if "Junk" in (frozenset(edits.incident_types) - frozenset(incident.incident_types)):
+                    if IncidentType.Junk.value in (frozenset(edits.incident_types) - frozenset(incident.incident_types)):
                         # Junk was added as an incident type; let's close.
                         close_incident()
 

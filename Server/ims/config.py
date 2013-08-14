@@ -30,7 +30,7 @@ from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
 from twisted.python import log
 from twisted.python.filepath import FilePath
 
-from ims.data import to_json_text
+from ims.data import to_json_text, IncidentType
 from ims.dms import DutyManagementSystem
 from ims.store import Storage
 
@@ -129,27 +129,27 @@ class Configuration (object):
         self.DMSPassword = valueFromConfig("DMS", "Password", None)
 
         self.IncidentTypes = (
-            "Admin",
-            "Art",
-            "Assault",
-            "Commerce",
-            "Echelon",
-            "Eviction",
-            "Fire",
-            "Gate",
-            "Green Dot",
-            "HQ",
-            "Law Enforcement",
-            "Lost Child",
-            "Medical",
-            "Mental Health",
-            "MOOP",
-            "SITE",
-            "Staff",
-            "Theme Camp",
-            "Vehicle",
+            u"Art",
+            u"Assault",
+            u"Commerce",
+            u"Echelon",
+            u"Eviction",
+            u"Fire",
+            u"Gate",
+            u"Green Dot",
+            u"HQ",
+            u"Law Enforcement",
+            u"Lost Child",
+            u"Medical",
+            u"Mental Health",
+            u"MOOP",
+            u"SITE",
+            u"Staff",
+            u"Theme Camp",
+            u"Vehicle",
 
-            "Junk",
+            IncidentType.Admin.value,
+            IncidentType.Junk.value,
         )
 
         #

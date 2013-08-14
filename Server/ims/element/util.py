@@ -30,7 +30,11 @@ __all__ = [
 
 from datetime import datetime as DateTime, timedelta as TimeDelta
 
-incident_types_to_ignore = set([u"Junk"])
+from ims.data import IncidentType
+
+
+
+incident_types_to_ignore = set((IncidentType.Junk.value,))
 
 
 
