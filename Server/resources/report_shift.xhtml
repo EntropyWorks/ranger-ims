@@ -10,11 +10,12 @@
 
     <form action="" method="get">
       <label>
+        Show:
         <select name="num_shifts" onclick="this.form.submit();">
-          <option value="1" t:render="num_shifts_selected">Show 1 shift</option>
-          <option value="2" t:render="num_shifts_selected">Show 2 shifts</option>
-          <option value="3" t:render="num_shifts_selected">Show 3 shifts</option>
-          <option value="0" t:render="num_shifts_selected">Show all shifts</option>
+          <option value="1" t:render="num_shifts_selected">1 shift</option>
+          <option value="2" t:render="num_shifts_selected">2 shifts</option>
+          <option value="3" t:render="num_shifts_selected">3 shifts</option>
+          <option value="0" t:render="num_shifts_selected">all shifts</option>
         </select>
       </label>
     </form>

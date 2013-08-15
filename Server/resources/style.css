@@ -5,6 +5,8 @@ p, dd {
  margin-bottom: 0.5em;
 }
 
+select, label, input { display: inline-block; }
+
 table.activity { table-layout: fixed; margin-bottom: 20pt; }
 caption.activity { text-align: center; margin-bottom: 4pt; }
 tbody.activity { border: 1px solid black; }
@@ -18,3 +20,17 @@ th.rangers  { width:  8em; }
 th.location { width: 16em; }
 th.types    { width:  8em; }
 th.summary  {}
+
+#incident_form {
+  border: 1px solid #d0d2d5;
+  border-radius: 4px;
+  margin: 20px;
+  padding: 20px;
+}
+
+#incident_number, #incident_state, #incident_priority {
+  width: 33%;
+}
+#incident_number {}
+#incident_state {}
+#incident_priority {}

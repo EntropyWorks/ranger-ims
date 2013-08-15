@@ -6,86 +6,75 @@
     <link t:render="stylesheet" />
   </head>
   <body>
-    <h1 t:render="title" />
-
     <form id="incident_form">
 
-      <div id="incident_view">
+      <fieldset id="incident_header_fields">
 
-        <div id="incident_header">
+        <label id="incident_number">
+          Incident #: <span t:render="number" />
+        </label>
 
-          <span id="incident_number">
-            Incident #: <span t:render="number" />
-          </span>
+        <label id="incident_state">
+          State:
+          <select name="state">
+            <option value="created"    t:render="state_selected">New       </option>
+            <option value="dispatched" t:render="state_selected">Dispatched</option>
+            <option value="on_scene"   t:render="state_selected">On Scene  </option>
+            <option value="closed"     t:render="state_selected">Closed    </option>
+          </select>
+        </label>
 
-          <span id="incident_state">
-            <label>
-              <select name="state">
-                <option value="created"    t:render="state_selected">New       </option>
-                <option value="dispatched" t:render="state_selected">Dispatched</option>
-                <option value="on_scene"   t:render="state_selected">On Scene  </option>
-                <option value="closed"     t:render="state_selected">Closed    </option>
-              </select>
-            </label>
-          </span>
+        <label id="incident_priority">
+          Priority:
+          <select name="priority">
+            <option value="1" t:render="priority_selected">1</option>
+            <option value="2" t:render="priority_selected">2</option>
+            <option value="3" t:render="priority_selected">3</option>
+            <option value="4" t:render="priority_selected">4</option>
+            <option value="5" t:render="priority_selected">5</option>
+          </select>
+        </label>
 
-          <span id="incident_priority">
-            <label>
-              Priority:
-              <select name="priority">
-                <option value="1" t:render="priority_selected">1</option>
-                <option value="2" t:render="priority_selected">2</option>
-                <option value="3" t:render="priority_selected">3</option>
-                <option value="4" t:render="priority_selected">4</option>
-                <option value="5" t:render="priority_selected">5</option>
-              </select>
-            </label>
-          </span>
+      </fieldset> <!-- id="incident_header_fields" -->
 
-        </div> <!-- id="incident_header" -->
+      <label id="incident_summary">
+        Summary:
+        <input type="text" name="summary" placeholder="Summary..." t:render="summary_value" />
+      </label>
 
-        <div id="incident_summary">
-          <label>
-            Summary:
-            <input type="text" name="summary" placeholder="Summary..." size="100" t:render="summary_value" />
-          </label>
-        </div>
+      <fieldset id="incident_tags">
+        <label id="incident_rangers">
+          <select name="rangers" multiple="">
+            <option value="a">Friday</option>
+            <option value="b">Saturday</option>
+            <option value="c">Sunday</option>
+          </select>
+        </label>
+        <label id="incident_types">
+          <select name="types" multiple="">
+            <option value="a">Friday</option>
+            <option value="b">Saturday</option>
+            <option value="c">Sunday</option>
+          </select>
+        </label>
+      </fieldset> <!-- id="incident_tags" -->
 
-        <div id="incident_tags">
+      <fieldset id="incident_location">
+        <legend>Location</legend>
+        <label id="incident_location_name">
+          Location name:
+          <input type="text" name="location_name" placeholder="Name of location..." size="100" t:render="location_name_value" />
+        </label>
+        <label id="incident_location_address">
+          Location address:
+          <input type="text" name="location_address" placeholder="Address of location..." size="100" t:render="location_address_value" />
+        </label>
+      </fieldset> <!-- id="incident_location" -->
 
-          <div id="incident_rangers">
-          </div>
-
-          <div id="incident_types">
-          </div>
-
-        </div> <!-- id="incident_tags" -->
-
-        <div id="incident_location">
-
-          <div id="incident_location_name">
-            <label>
-              Location name:
-              <input type="text" name="location_name" placeholder="Name of location..." size="100" t:render="location_name_value" />
-            </label>
-          </div>
-
-          <div id="incident_location_address">
-            <label>
-              Location address:
-              <input type="text" name="location_address" placeholder="Address of location..." size="100" t:render="location_address_value" />
-            </label>
-          </div>
-
-        </div> <!-- id="incident_location" -->
-
-        <div id="incident_report">
-
-          <textarea id="incident_report_text" />
-
-        </div> <!-- id="incident_report -->
-
-      </div> <!-- id="incident_view" -->
+      <fieldset id="incident_report">
+        <legend>Incident Report</legend>
+        <textarea id="incident_report_text" />
+      </fieldset> <!-- id="incident_report -->
 
     </form> <!-- id="incident_form" -->
 
