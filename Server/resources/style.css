@@ -7,19 +7,19 @@ p, dd {
 
 select, label, input { display: inline-block; }
 
-table.activity { table-layout: fixed; margin-bottom: 20pt; }
-caption.activity { text-align: center; margin-bottom: 4pt; }
-tbody.activity { border: 1px solid black; }
+table.incident_activity { table-layout: fixed; margin-bottom: 20pt; }
+caption.incident_activity { text-align: center; margin-bottom: 4pt; }
+tbody.incident_activity { border: 1px solid black; }
 
 tr.incident:hover { background-color: #FFFF00; }
 
-th.number   { width:  4em; }
-th.priority { width:  4em; }
-th.state    { width:  4em; }
-th.rangers  { width:  8em; }
-th.location { width: 16em; }
-th.types    { width:  8em; }
-th.summary  {}
+th.incident_number   { width:  4em; }
+th.incident_priority { width:  4em; }
+th.incident_state    { width:  4em; }
+th.incident_rangers  { width:  8em; }
+th.incident_location { width: 16em; }
+th.incident_types    { width:  8em; }
+th.incident_summary  {}
 
 #incident_form {
   border: 1px solid #d0d2d5;

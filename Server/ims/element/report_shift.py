@@ -178,31 +178,37 @@ class ShiftActivityElement(BaseElement):
 
 
 def incidents_as_table(incidents, caption=None, id=None):
+    attrs_activity = {"class": "incident_activity"}
+
     if caption:
-        captionElement = tags.caption(caption, **{"class": "activity"})
+        captionElement = tags.caption(caption, **attrs_activity)
     else:
         captionElement = ""
 
     def incidents_as_rows(incidents):
         attrs_incident = {"class": "incident"}
-        attrs_number   = {"class": "number"  }
-        attrs_priority = {"class": "priority"}
-        attrs_rangers  = {"class": "rangers" }
-        attrs_location = {"class": "location"}
-        attrs_types    = {"class": "types"   }
-        attrs_summary  = {"class": "summary" }
+        attrs_number   = {"class": "incident_number"  }
+        attrs_priority = {"class": "incident_priority"}
+        attrs_rangers  = {"class": "incident_rangers" }
+        attrs_location = {"class": "incident_location"}
+        attrs_types    = {"class": "incident_types"   }
+        attrs_summary  = {"class": "incident_summary" }
         
-        yield tags.tr(
-            tags.th(u"#"       , **attrs_number  ),
-            tags.th(u"Priority", **attrs_priority),
-            tags.th(u"Rangers" , **attrs_rangers ),
-            tags.th(u"Location", **attrs_location),
-            tags.th(u"Types"   , **attrs_types   ),
-            tags.th(u"Summary" , **attrs_summary ),
-            **attrs_incident
+        yield tags.thead(
+            tags.tr(
+                tags.th(u"#"       , **attrs_number  ),
+                tags.th(u"Priority", **attrs_priority),
+                tags.th(u"Rangers" , **attrs_rangers ),
+                tags.th(u"Location", **attrs_location),
+                tags.th(u"Types"   , **attrs_types   ),
+                tags.th(u"Summary" , **attrs_summary ),
+                **attrs_incident
+            ),
+            **attrs_activity
         )
-        for incident in sorted(incidents):
-            yield tags.tr(
+
+        yield tags.tbody(
+            tags.tr(
                 tags.td(u"{0}".format(incident.number), **attrs_number), 
                 tags.td(u"{0}".format(incident.priority), **attrs_priority),  
                 tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers)), **attrs_rangers),
@@ -212,16 +218,15 @@ def incidents_as_table(incidents, caption=None, id=None):
                 #onclick="""window.open("?foo", "_blank");""",
                 **attrs_incident
             )
+            for incident in sorted(incidents)
+        )
 
-    attrs_activity = {"class": "activity"}
-    if id is not None:
-        attrs_activity["id"] = id
+#    if id is None:
+#        id = ""
 
     return tags.table(
         captionElement,
-        tags.tbody(
-            incidents_as_rows(incidents),
-            **attrs_activity
-        ),
+        incidents_as_rows(incidents),
+        id=id,
         **attrs_activity
     )
