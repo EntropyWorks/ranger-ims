@@ -39,6 +39,7 @@ from ims.sauce import HeaderName, ContentType
 from ims.element.file import FileElement
 from ims.element.home import HomePageElement
 from ims.element.queue import DispatchQueueElement
+from ims.element.incident import IncidentElement
 from ims.element.report_daily import DailyReportElement
 from ims.element.report_shift import ShiftReportElement
 from ims.element.util import incidents_from_query
@@ -334,6 +335,13 @@ class IncidentManagementSystem(object):
 
         set_response_header(request, HeaderName.contentType, ContentType.HTML)
         return DispatchQueueElement(self)
+
+
+    @app.route("/queue/incidents/<number>", methods=("GET",))
+    @http_sauce
+    def queue_incident(self, request, number):
+        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        return IncidentElement(self, number)
 
 
     #
