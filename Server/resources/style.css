@@ -1,11 +1,30 @@
 @import url("/baseline/compressed/baseline.compress.css");
 
+
 p, dd {
  text-indent: 1.5em;
  margin-bottom: 0.5em;
 }
 
-select, label, input { display: inline-block; }
+
+label, select, input, textarea { display: inline-block; }
+
+label { font-weight: bold; }
+
+select[multiple], input, textarea {
+  border: 1px solid #c6c9cc;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 #fff;
+}
+
+fieldset.boxed {
+  border: 1px solid #d0d2d5;
+  box-shadow: inset 0 1px 0 #fff,0 1px 0 #fff;
+  padding: 8pt;
+}
+fieldset.boxed legend {
+  padding: 0 2pt;
+}
+
 
 table.incident_activity { table-layout: fixed; margin-bottom: 20pt; }
 caption.incident_activity { text-align: center; margin-bottom: 4pt; }
@@ -20,17 +39,3 @@ th.incident_rangers  { width:  8em; }
 th.incident_location { width: 16em; }
 th.incident_types    { width:  8em; }
 th.incident_summary  {}
-
-#incident_form {
-  border: 1px solid #d0d2d5;
-  border-radius: 4px;
-  margin: 20px;
-  padding: 20px;
-}
-
-#incident_number, #incident_state, #incident_priority {
-  width: 33%;
-}
-#incident_number {}
-#incident_state {}
-#incident_priority {}

@@ -4,6 +4,32 @@
     <title t:render="title" />
     <link t:render="icon" />
     <link t:render="stylesheet" />
+    <style>
+      #incident_form {
+        border: 1px solid #c6c9cc;
+        border-radius: 4px;
+        margin: 20px;
+        padding: 20px;
+      }
+
+      #incident_number, #incident_state, #incident_priority { width: 32%; }
+
+      #incident_header_fields, #incident_summary_fields { text-align: center; }
+
+      #incident_number   { text-align: left  ; }
+      #incident_state    { text-align: center; }
+      #incident_priority { text-align: right ; }
+
+      #incident_number {}
+      #incident_state {}
+      #incident_priority {}
+
+      #incident_summary input { display: inline-block; }
+
+      #incident_tags { text-align: center; }
+      #incident_tags label { width: 49%; }
+      #incident_tags label select { width: 98%; }
+    </style>
   </head>
   <body>
     <form id="incident_form">
@@ -15,7 +41,6 @@
         </label>
 
         <label id="incident_state">
-          State:
           <select name="state">
             <option value="created"    t:render="state_selected">New       </option>
             <option value="dispatched" t:render="state_selected">Dispatched</option>
@@ -37,13 +62,16 @@
 
       </fieldset> <!-- id="incident_header_fields" -->
 
-      <label id="incident_summary">
-        Summary:
-        <input type="text" name="summary" placeholder="Summary..." t:render="summary_value" />
-      </label>
+      <fieldset id="incident_summary_fields">
+        <label id="incident_summary">
+          Summary:
+          <input type="text" name="summary" placeholder="Summary..." t:render="summary_value" />
+        </label>
+      </fieldset>
 
       <fieldset id="incident_tags">
         <label id="incident_rangers">
+          Rangers<br />
           <select name="rangers" multiple="">
             <option value="a">Friday</option>
             <option value="b">Saturday</option>
@@ -51,6 +79,7 @@
           </select>
         </label>
         <label id="incident_types">
+          Incident Types<br />
           <select name="types" multiple="">
             <option value="a">Friday</option>
             <option value="b">Saturday</option>
@@ -59,14 +88,14 @@
         </label>
       </fieldset> <!-- id="incident_tags" -->
 
-      <fieldset id="incident_location">
+      <fieldset id="incident_location" class="boxed">
         <legend>Location</legend>
         <label id="incident_location_name">
-          Location name:
+          Name:
           <input type="text" name="location_name" placeholder="Name of location..." size="100" t:render="location_name_value" />
         </label>
         <label id="incident_location_address">
-          Location address:
+          Address:
           <input type="text" name="location_address" placeholder="Address of location..." size="100" t:render="location_address_value" />
         </label>
       </fieldset> <!-- id="incident_location" -->
