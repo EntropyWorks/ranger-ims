@@ -221,12 +221,12 @@ def incidents_as_table(incidents, caption=None, id=None):
             for incident in sorted(incidents)
         )
 
-#    if id is None:
-#        id = ""
+    attrs_table = dict(attrs_activity)
+    if id is not None:
+        attrs_table["id"] = id
 
     return tags.table(
         captionElement,
         incidents_as_rows(incidents),
-        id=id,
-        **attrs_activity
+        **attrs_table
     )
