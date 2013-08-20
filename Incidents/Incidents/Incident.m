@@ -177,7 +177,7 @@ NSDate *dateFromRFC3339String(NSString *rfc3339String);
                       dispatched:nil
                          onScene:nil
                           closed:nil
-                        priority:@5];
+                        priority:@3];
 }
 
 
