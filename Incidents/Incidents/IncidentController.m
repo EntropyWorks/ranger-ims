@@ -242,6 +242,21 @@ static NSDateFormatter *entryDateFormatter = nil;
 }
 
 
+- (IBAction) markClosedAndSave:(id)sender
+{
+    NSPopUpButton *statePopUp = self.statePopUp;
+    NSInteger stateTag = statePopUp.selectedItem.tag;
+
+    if (stateTag != 4) {
+        [statePopUp selectItemWithTag:4];
+        [self editState:self];
+    }
+
+    [self save:self];
+    [self.window performClose:self];
+}
+
+
 - (IBAction) reload:(id)sender
 {
     if (self.incident.isNew) {
