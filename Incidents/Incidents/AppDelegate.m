@@ -219,8 +219,10 @@
 
 - (NSURLCredential *) credentialForChallenge:(NSURLAuthenticationChallenge *)challenge
 {
-    if (! challenge.proposedCredential || ! challenge.proposedCredential.hasPassword ||
-        challenge.previousFailureCount > 0)
+//    if (! challenge.proposedCredential || ! challenge.proposedCredential.hasPassword ||
+//        challenge.previousFailureCount > 0)
+
+    if (! self.serverPassword)
     {
         [self.passwordController showWindow:self];
         [self.passwordController.window makeKeyAndOrderFront:self];
@@ -230,7 +232,7 @@
 
     return [NSURLCredential credentialWithUser:self.serverUserName
                                       password:self.serverPassword
-                                   persistence:NSURLCredentialPersistenceForSession];
+                                   persistence:NSURLCredentialPersistenceNone];
 }
 
 
@@ -277,6 +279,12 @@
 - (IBAction) openHelp:(id)sender
 {
     [self openURLPathOnServer:@"/"];
+}
+
+
+- (IBAction) logout:(id)sender
+{
+    self.serverPassword = nil;
 }
 
 
