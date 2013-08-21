@@ -22,7 +22,7 @@ __all__ = [
     "IncidentElement",
 ]
 
-from twisted.web.template import renderer
+from twisted.web.template import renderer, tags
 
 from ims.element.base import BaseElement
 
@@ -84,3 +84,16 @@ class IncidentElement(BaseElement):
     @renderer
     def location_address_value(self, request, tag):
         return tag(value=u"{0}".format(self.incident.location.address))
+
+
+    @renderer
+    def incident_report(self, request, tag):
+        def entries_rendered():
+            attrs_entry = {"class": "incident_entry"}
+
+            for entry in self.incident.report_entries:
+                yield tags.div(entry.text, **attrs_entry)
+
+        return tag(
+            *entries_rendered()
+        )

@@ -29,6 +29,10 @@
       #incident_tags { text-align: center; }
       #incident_tags label        { width:  49%; }
       #incident_tags label select { width: 100%; }
+
+      #incident_report_text { border: 1px solid #c6c9cc; }
+
+      .incident_entry { margin-bottom: 4pt; }
     </style>
   </head>
   <body>
@@ -81,9 +85,9 @@
         <label id="incident_types">
           Incident Types<br />
           <select name="types" multiple="">
-            <option value="a">Friday</option>
-            <option value="b">Saturday</option>
-            <option value="c">Sunday</option>
+            <option value="a">January</option>
+            <option value="b">February</option>
+            <option value="c">March</option>
           </select>
         </label>
       </fieldset> <!-- id="incident_tags" -->
@@ -102,7 +106,8 @@
 
       <fieldset id="incident_report">
         <legend>Incident Report</legend>
-        <textarea id="incident_report_text" />
+        <div id="incident_report_text" t:render="incident_report" />
+        <!-- <textarea id="incident_report_input" /> -->
       </fieldset> <!-- id="incident_report -->
 
     </form> <!-- id="incident_form" -->
