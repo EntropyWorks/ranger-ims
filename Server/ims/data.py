@@ -233,8 +233,9 @@ class Incident(object):
 
     def __str__(self):
         return (
-            "{self.number}: {summary}"
+            u"{self.number}: {summary}"
             .format(self=self, summary=self.summaryFromReport())
+            .encode("utf-8")
         )
 
 
@@ -434,9 +435,9 @@ class ReportEntry(object):
 
     def __str__(self):
         if self.system_entry:
-            prefix = "*"
+            prefix = u"*"
         else:
-            prefix = ""
+            prefix = u""
 
         return (
             u"{prefix}{self.author}@{self.created}: {self.text}"
@@ -514,7 +515,7 @@ class Ranger(object):
 
 
     def __str__(self):
-        return "{self.handle} ({self.name})".format(self=self)
+        return u"{self.handle} ({self.name})".format(self=self).encode("utf-8")
 
 
     def __repr__(self):
@@ -572,12 +573,12 @@ class Location(object):
     def __str__(self):
         if self.name:
             if self.address:
-                return "{self.name} ({self.address})".format(self=self)
+                return u"{self.name} ({self.address})".format(self=self).encode("utf-8")
             else:
-                return "{self.name}".format(self=self)
+                return u"{self.name}".format(self=self).encode("utf-8")
         else:
             if self.address:
-                return "({self.address})".format(self=self)
+                return u"({self.address})".format(self=self).encode("utf-8")
             else:
                 return ""
 
@@ -688,7 +689,7 @@ class Shift(object):
 
 
     def __str__(self):
-        return "{self.start:%y-%m-%d %a} {self.name.name}".format(self=self)
+        return u"{self.start:%y-%m-%d %a} {self.name.name}".format(self=self).encode("utf-8")
 
 
     @property
