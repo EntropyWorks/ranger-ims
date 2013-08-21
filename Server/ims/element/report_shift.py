@@ -212,10 +212,10 @@ def incidents_as_table(incidents, caption=None, id=None):
                 tags.td(u"{0}".format(incident.number), **attrs_number), 
                 tags.td(u"{0}".format(incident.priority), **attrs_priority),  
                 tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers)), **attrs_rangers),
-                tags.td(u"{0}".format(incident.location), **attrs_location),
+                tags.td(u"{0}".format(str(incident.location).decode("utf-8")), **attrs_location),
                 tags.td(u"{0}".format(", ".join(incident.incident_types)), **attrs_types),
                 tags.td(u"{0}".format(incident.summaryFromReport()), **attrs_summary),
-                #onclick="""window.open("?foo", "_blank");""",
+                onclick="""window.open("/queue/incidents/{0}");""".format(incident.number),
                 **attrs_incident
             )
             for incident in sorted(incidents)
