@@ -76,19 +76,11 @@
       <fieldset id="incident_tags">
         <label id="incident_rangers">
           Rangers<br />
-          <select name="rangers" multiple="">
-            <option value="a">Friday</option>
-            <option value="b">Saturday</option>
-            <option value="c">Sunday</option>
-          </select>
+          <select name="rangers" multiple="" t:render="rangers_options" />
         </label>
         <label id="incident_types">
           Incident Types<br />
-          <select name="types" multiple="">
-            <option value="a">January</option>
-            <option value="b">February</option>
-            <option value="c">March</option>
-          </select>
+          <select name="rangers" multiple="" t:render="types_options" />
         </label>
       </fieldset> <!-- id="incident_tags" -->
 

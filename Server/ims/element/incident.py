@@ -77,6 +77,28 @@ class IncidentElement(BaseElement):
 
 
     @renderer
+    def rangers_options(self, request, tag):
+        return tag(
+            tags.option(
+                u"{ranger.handle} ({ranger.name})".format(ranger=ranger),
+                value=ranger.handle
+            )
+            for ranger in self.incident.rangers
+        )
+
+
+    @renderer
+    def types_options(self, request, tag):
+        return tag(
+            tags.option(
+                type,
+                value=type
+            )
+            for type in self.incident.incident_types
+        )
+
+
+    @renderer
     def location_name_value(self, request, tag):
         return tag(value=u"{0}".format(self.incident.location.name))
 
@@ -94,6 +116,4 @@ class IncidentElement(BaseElement):
             for entry in self.incident.report_entries:
                 yield tags.div(entry.text, **attrs_entry)
 
-        return tag(
-            *entries_rendered()
-        )
+        return tag(*entries_rendered())
