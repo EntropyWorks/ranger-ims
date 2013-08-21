@@ -50,12 +50,25 @@ class IncidentElement(BaseElement):
 
     @renderer
     def state_selected(self, request, tag):
-        return tag # FIXME
+        for state, name in (
+            (self.incident.closed    , "closed"    ),
+            (self.incident.on_scene  , "on_scene"  ),
+            (self.incident.dispatched, "dispatched"),
+            (self.incident.created   , "created"   ),
+        ):
+            if state:
+                if tag.attributes["value"] == name:
+                    return tag(selected="")
+                else:
+                    return tag;
 
 
     @renderer
     def priority_selected(self, request, tag):
-        return tag # FIXME
+        if int(tag.attributes["value"]) == self.incident.priority:
+            return tag(selected="")
+        else:
+            return tag;
 
 
     @renderer
