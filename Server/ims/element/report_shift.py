@@ -30,6 +30,7 @@ from ims.data import Shift
 from ims.element.base import BaseElement
 from ims.element.util import ignore_incident, ignore_entry
 from ims.element.util import num_shifts_from_query
+from ims.element.util import incidents_as_table
 
 
 
@@ -174,59 +175,3 @@ class ShiftActivityElement(BaseElement):
             activity("Carried and closed", closed - created),
             activity("Opened and closed", created & closed),
         )
-
-
-
-def incidents_as_table(incidents, caption=None, id=None):
-    attrs_activity = {"class": "incident_activity"}
-
-    if caption:
-        captionElement = tags.caption(caption, **attrs_activity)
-    else:
-        captionElement = ""
-
-    def incidents_as_rows(incidents):
-        attrs_incident = {"class": "incident"}
-        attrs_number   = {"class": "incident_number"  }
-        attrs_priority = {"class": "incident_priority"}
-        attrs_rangers  = {"class": "incident_rangers" }
-        attrs_location = {"class": "incident_location"}
-        attrs_types    = {"class": "incident_types"   }
-        attrs_summary  = {"class": "incident_summary" }
-        
-        yield tags.thead(
-            tags.tr(
-                tags.th(u"#"       , **attrs_number  ),
-                tags.th(u"Priority", **attrs_priority),
-                tags.th(u"Rangers" , **attrs_rangers ),
-                tags.th(u"Location", **attrs_location),
-                tags.th(u"Types"   , **attrs_types   ),
-                tags.th(u"Summary" , **attrs_summary ),
-                **attrs_incident
-            ),
-            **attrs_activity
-        )
-
-        yield tags.tbody(
-            tags.tr(
-                tags.td(u"{0}".format(incident.number), **attrs_number), 
-                tags.td(u"{0}".format(incident.priority), **attrs_priority),  
-                tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers)), **attrs_rangers),
-                tags.td(u"{0}".format(str(incident.location).decode("utf-8")), **attrs_location),
-                tags.td(u"{0}".format(", ".join(incident.incident_types)), **attrs_types),
-                tags.td(u"{0}".format(incident.summaryFromReport()), **attrs_summary),
-                onclick="""window.open("/queue/incidents/{0}");""".format(incident.number),
-                **attrs_incident
-            )
-            for incident in sorted(incidents)
-        )
-
-    attrs_table = dict(attrs_activity)
-    if id is not None:
-        attrs_table["id"] = id
-
-    return tags.table(
-        captionElement,
-        incidents_as_rows(incidents),
-        **attrs_table
-    )

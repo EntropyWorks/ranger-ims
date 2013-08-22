@@ -33,6 +33,8 @@ __all__ = [
 
 from datetime import datetime as DateTime, timedelta as TimeDelta
 
+from twisted.web.template import tags
+
 from ims.data import IncidentType
 
 
@@ -127,3 +129,58 @@ def query_value(request, key, default, no_args_default=None):
                 setattr(request, attr_name, default)
 
     return getattr(request, attr_name)
+
+
+def incidents_as_table(incidents, caption=None, id=None):
+    attrs_activity = {"class": "incident_activity"}
+
+    if caption:
+        captionElement = tags.caption(caption, **attrs_activity)
+    else:
+        captionElement = ""
+
+    def incidents_as_rows(incidents):
+        attrs_incident = {"class": "incident"}
+        attrs_number   = {"class": "incident_number"  }
+        attrs_priority = {"class": "incident_priority"}
+        attrs_rangers  = {"class": "incident_rangers" }
+        attrs_location = {"class": "incident_location"}
+        attrs_types    = {"class": "incident_types"   }
+        attrs_summary  = {"class": "incident_summary" }
+        
+        yield tags.thead(
+            tags.tr(
+                tags.th(u"#"       , **attrs_number  ),
+                tags.th(u"Priority", **attrs_priority),
+                tags.th(u"Rangers" , **attrs_rangers ),
+                tags.th(u"Location", **attrs_location),
+                tags.th(u"Types"   , **attrs_types   ),
+                tags.th(u"Summary" , **attrs_summary ),
+                **attrs_incident
+            ),
+            **attrs_activity
+        )
+
+        yield tags.tbody(
+            tags.tr(
+                tags.td(u"{0}".format(incident.number), **attrs_number), 
+                tags.td(u"{0}".format(incident.priority), **attrs_priority),  
+                tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers)), **attrs_rangers),
+                tags.td(u"{0}".format(str(incident.location).decode("utf-8")), **attrs_location),
+                tags.td(u"{0}".format(", ".join(incident.incident_types)), **attrs_types),
+                tags.td(u"{0}".format(incident.summaryFromReport()), **attrs_summary),
+                onclick="""window.open("/queue/incidents/{0}");""".format(incident.number),
+                **attrs_incident
+            )
+            for incident in sorted(incidents)
+        )
+
+    attrs_table = dict(attrs_activity)
+    if id is not None:
+        attrs_table["id"] = id
+
+    return tags.table(
+        captionElement,
+        incidents_as_rows(incidents),
+        **attrs_table
+    )

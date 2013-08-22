@@ -30,25 +30,13 @@ from ims.element.util import incidents_from_query
 from ims.element.util import show_closed_from_query
 from ims.element.util import terms_from_query
 from ims.element.util import since_days_ago_from_query
+from ims.element.util import incidents_as_table
 
 
 
 class DispatchQueueElement(BaseElement):
     def __init__(self, ims):
         BaseElement.__init__(self, ims, "queue", "Dispatch Queue")
-
-
-    @renderer
-    def columns(self, request, tag):
-        return to_json_text([
-            "#",
-            "Priority",
-            "Created", "Dispatched", "On Scene", "Closed",
-            "Rangers",
-            "Location",
-            "Type",
-            "Description"
-        ])
 
 
     @renderer
@@ -88,6 +76,18 @@ class DispatchQueueElement(BaseElement):
             ])
 
         return to_json_text(data)
+
+
+    @renderer
+    def queue(self, request, tag):
+        return tag(incidents_as_table(
+            (
+                self.ims.storage.read_incident_with_number(number)
+                for number, etag in incidents_from_query(self.ims, request)
+            ),
+            caption = "Dispatch Queue",
+            id = "dispatch_queue",
+        ))
 
 
     @renderer
