@@ -69,18 +69,18 @@
       <fieldset id="incident_summary_fields">
         <label id="incident_summary">
           Summary:
-          <input type="text" name="summary" placeholder="Summary..." t:render="summary_value" />
+          <input type="text" name="summary" placeholder="Summary..." t:render="summary_value" disabled="" />
         </label>
       </fieldset>
 
       <fieldset id="incident_tags">
         <label id="incident_rangers">
           Rangers<br />
-          <select name="rangers" multiple="" t:render="rangers_options" />
+          <select name="rangers" multiple="" t:render="rangers_options" disabled="" />
         </label>
         <label id="incident_types">
           Incident Types<br />
-          <select name="rangers" multiple="" t:render="types_options" />
+          <select name="rangers" multiple="" t:render="types_options" disabled="" />
         </label>
       </fieldset> <!-- id="incident_tags" -->
 
@@ -88,11 +88,11 @@
         <legend>Location</legend>
         <label id="incident_location_name">
           Name:
-          <input type="text" name="location_name" placeholder="Name of location..." size="100" t:render="location_name_value" />
+          <input type="text" name="location_name" placeholder="Name of location..." size="100" t:render="location_name_value" disabled="" />
         </label>
         <label id="incident_location_address">
           Address:
-          <input type="text" name="location_address" placeholder="Address of location..." size="100" t:render="location_address_value" />
+          <input type="text" name="location_address" placeholder="Address of location..." size="100" t:render="location_address_value" disabled="" />
         </label>
       </fieldset> <!-- id="incident_location" -->
 
