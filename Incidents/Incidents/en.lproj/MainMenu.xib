@@ -241,14 +241,6 @@
 									<reference key="NSOnImage" ref="35465992"/>
 									<reference key="NSMixedImage" ref="502551668"/>
 								</object>
-								<object class="NSMenuItem" id="130358892">
-									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Log Out</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="35465992"/>
-									<reference key="NSMixedImage" ref="502551668"/>
-								</object>
 								<object class="NSMenuItem" id="1010469920">
 									<reference key="NSMenu" ref="720053764"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -1364,14 +1356,6 @@
 					<int key="connectionID">630</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">logout:</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="130358892"/>
-					</object>
-					<int key="connectionID">632</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">hidden: values.EnableDebugMenu</string>
 						<reference key="source" ref="532214597"/>
@@ -1491,7 +1475,6 @@
 							<reference ref="1010469920"/>
 							<reference ref="537881830"/>
 							<reference ref="805345747"/>
-							<reference ref="130358892"/>
 							<reference ref="260275213"/>
 						</array>
 						<reference key="parent" ref="379814623"/>
@@ -2078,11 +2061,6 @@
 						<reference key="parent" ref="1054936789"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">631</int>
-						<reference key="object" ref="130358892"/>
-						<reference key="parent" ref="720053764"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">633</int>
 						<reference key="object" ref="260275213"/>
 						<reference key="parent" ref="720053764"/>
@@ -2183,7 +2161,6 @@
 				<string key="615.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="626.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="627.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="631.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="633.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="73.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="74.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2206,6 +2183,55 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">AppDelegate</string>
 					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="findIncident:">id</string>
+						<string key="newIncident:">id</string>
+						<string key="openHelp:">id</string>
+						<string key="showAllIncidentTypes:">id</string>
+						<string key="showAllIncidents:">id</string>
+						<string key="showAllRangers:">id</string>
+						<string key="showDispatchQueue:">id</string>
+						<string key="showOpenIncidents:">id</string>
+						<string key="showPreferences:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="findIncident:">
+							<string key="name">findIncident:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="newIncident:">
+							<string key="name">newIncident:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openHelp:">
+							<string key="name">openHelp:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showAllIncidentTypes:">
+							<string key="name">showAllIncidentTypes:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showAllIncidents:">
+							<string key="name">showAllIncidents:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showAllRangers:">
+							<string key="name">showAllRangers:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showDispatchQueue:">
+							<string key="name">showDispatchQueue:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showOpenIncidents:">
+							<string key="name">showOpenIncidents:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showPreferences:">
+							<string key="name">showPreferences:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">serverResourcesMenu</string>
 						<string key="NS.object.0">NSMenu</string>
