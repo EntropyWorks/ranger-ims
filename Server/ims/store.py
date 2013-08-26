@@ -25,6 +25,7 @@ __all__ = [
 from hashlib import sha1 as etag_hash
 
 from twisted.python import log
+from twisted.python.filepath import UnlistableError
 from ims.data import Incident
 
 
@@ -105,20 +106,23 @@ class Storage(object):
 
 
     def _list_incidents(self):
-        for child in self.path.children():
-            name = child.basename()
-            if name.startswith("."):
-                continue
-            try:
-                number = int(name)
-            except ValueError:
-                log.err(
-                    "Invalid filename in data store: {0}"
-                    .format(name)
-                )
-                continue
+        try:
+            for child in self.path.children():
+                name = child.basename()
+                if name.startswith("."):
+                    continue
+                try:
+                    number = int(name)
+                except ValueError:
+                    log.err(
+                        "Invalid filename in data store: {0}"
+                        .format(name)
+                    )
+                    continue
 
-            yield number
+                yield number
+        except UnlistableError:
+            pass
 
 
     def list_incidents(self):
