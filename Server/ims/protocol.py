@@ -112,7 +112,10 @@ class IncidentManagementSystem(object):
     def list_incidents(self, request):
         #set_response_header(request, HeaderName.etag, "*") # FIXME
         set_response_header(request, HeaderName.contentType, ContentType.JSON)
-        return to_json_text(tuple(incidents_from_query(self, request)))
+        return to_json_text(sorted(
+            incidents_from_query(self, request),
+            cmp = lambda a,b: cmp(a[0], b[0]), reverse = True,
+        ))
 
 
     @app.route("/incidents/<number>", methods=("GET",))
