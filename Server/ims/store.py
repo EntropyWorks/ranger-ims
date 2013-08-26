@@ -240,7 +240,11 @@ class Storage(object):
         if self.incidents is not None:
             self.incidents[number] = None
 
-        #self.incidents[number] = incident
+        # Clear the cached etag
+        if number in self.incident_etags:
+            del self.incident_etags[number]
+
+        self.incidents[number] = None
 
         if number > self._max_incident_number:
             self._max_incident_number = number
