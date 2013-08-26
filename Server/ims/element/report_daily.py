@@ -130,7 +130,7 @@ class DailyReportElement(BaseElement):
         incidents_by_date = self.incidents_by_date()
 
         for incident_type in sorted(incidents_by_type):
-            if incident_type in set((IncidentType.Admin.value,)):
+            if incident_type in set((IncidentType.Admin.value, "Echelon", "SITE")):
                 continue
 
             if labels:
