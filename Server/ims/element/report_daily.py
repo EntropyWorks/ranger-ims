@@ -51,11 +51,6 @@ class DailyReportElement(BaseElement):
                     if dt is None:
                         return
 
-                    from datetime import date as Date
-                    if dt.date() == Date.today():
-                        print "*"*80
-                        print dt.date(), "->", incident
-
                     if dt.hour < start_hour:
                         dates.add(dt.date() - TimeDelta(days=1))
                     else:
