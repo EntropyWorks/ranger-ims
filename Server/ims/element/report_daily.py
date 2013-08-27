@@ -38,7 +38,7 @@ class DailyReportElement(BaseElement):
         BaseElement.__init__(self, ims, template_name, "Daily Report")
 
 
-    def _index_incidents(self, start_hour=12):
+    def _index_incidents(self, start_hour=19): # 19 == 12 adjusted for timezone from UTC
         if not hasattr(self, "_incidents_by_date") or not hasattr(self, "_incidents_by_type"):
             storage = self.ims.storage
             incidents_by_date = {}
