@@ -110,10 +110,35 @@ class IncidentElement(BaseElement):
 
     @renderer
     def incident_report(self, request, tag):
-        def entries_rendered():
-            attrs_entry = {"class": "incident_entry"}
+        attrs_entry_system = {"class": "incident_entry_system"}
+        attrs_entry_user   = {"class": "incident_entry_user"}
+        attrs_timestamp    = {"class": "incident_entry_timestamp"}
+        attrs_entry_text   = {"class": "incident_entry_text"}
 
+        def entry_rendered(entry):
+            if entry.system_entry:
+                attrs_entry = attrs_entry_system
+            else:
+                attrs_entry = attrs_entry_user
+
+            return tags.div(
+                tags.span(
+                    str(entry.created),
+                    u", ",
+                    entry.author,
+                    **attrs_timestamp
+                ),
+                ":",
+                tags.br(),
+                tags.span(
+                    entry.text,
+                    **attrs_entry_text
+                ),
+                **attrs_entry
+            )
+
+        def entries_rendered():
             for entry in self.incident.report_entries:
-                yield tags.div(entry.text, **attrs_entry)
+                yield entry_rendered(entry)
 
         return tag(*entries_rendered())
