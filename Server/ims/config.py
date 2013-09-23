@@ -32,7 +32,7 @@ from twisted.python.filepath import FilePath
 
 from ims.data import to_json_text, IncidentType
 from ims.dms import DutyManagementSystem
-from ims.store import Storage
+from ims.store import Storage, ReadOnlyStorage
 
 
 
@@ -50,11 +50,14 @@ class Configuration (object):
             "Core.DataRoot: {DataRoot}\n"
             "Core.Resources: {Resources}\n"
             "Core.RejectClients: {RejectClients}\n"
+            "Core.ReadOnly: {ReadOnly}\n"
             "\n"
             "DMS.Hostname: {DMSHost}\n"
             "DMS.Database: {DMSDatabase}\n"
             "DMS.Username: {DMSUsername}\n"
             "DMS.Password: {DMSPassword}\n"
+            "\n"
+            "Incident types: {IncidentTypes}\n"
         ).format(**self.__dict__)
 
 
@@ -123,6 +126,8 @@ class Configuration (object):
         self.RejectClientsRegex = tuple([regex_compile(e) for e in rejectClients])
         log.msg("RejectClients: {0}".format(self.RejectClients))
 
+        self.ReadOnly = (valueFromConfig("Core", "ReadOnly", "false") == "true")
+
         self.DMSHost     = valueFromConfig("DMS", "Hostname", None)
         self.DMSDatabase = valueFromConfig("DMS", "Database", None)
         self.DMSUsername = valueFromConfig("DMS", "Username", None)
@@ -163,7 +168,12 @@ class Configuration (object):
             password = self.DMSPassword,
         )
 
-        storage = Storage(self.DataRoot)
+        if self.ReadOnly:
+            storageClass = ReadOnlyStorage
+        else:
+            storageClass = Storage
+
+        storage = storageClass(self.DataRoot)
         storage.provision()
         self.storage = storage
 

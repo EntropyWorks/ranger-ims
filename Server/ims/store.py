@@ -19,6 +19,9 @@ Data store
 """
 
 __all__ = [
+    "StorageError",
+    "NoSuchIncidentError",
+    "ReadOnlyStorage",
     "Storage",
 ]
 
@@ -44,7 +47,7 @@ class NoSuchIncidentError(StorageError):
 
 
 
-class Storage(object):
+class ReadOnlyStorage(object):
     """
     Back-end storage
     """
@@ -228,6 +231,8 @@ class Storage(object):
             handle.close()
 
 
+
+class Storage(ReadOnlyStorage):
     def write_incident(self, incident):
         incident.validate()
 
