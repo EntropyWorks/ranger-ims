@@ -25,6 +25,7 @@ set -u
 wd="$(cd "$(dirname "$0")/.." && pwd)";
 
 opt_nodaemon="";
+opt_ssl="";
 kill="false";
 
 usage ()
@@ -43,12 +44,13 @@ usage ()
     exit 64;
 }
 
-while getopts 'hXk' option; do
+while getopts 'hXks' option; do
     case "${option}" in
         '?') usage; ;;
         'h') usage -; exit 0; ;;
         'X') opt_nodaemon="--nodaemon"; ;;
         'k') kill="true"; ;;
+        's') opt_ssl="--port=ssl:8443"; ;;
     esac;
 done;
 
@@ -77,4 +79,5 @@ twistd                              \
   ${opt_nodaemon} web               \
   --notracebacks                    \
   --logfile="${wd}/log/access.log"  \
+  ${opt_ssl}                        \
   --class=ims.server.Resource;
