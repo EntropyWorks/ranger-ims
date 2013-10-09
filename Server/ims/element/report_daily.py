@@ -114,8 +114,19 @@ class DailyReportElement(BaseElement):
 
 
     @renderer
+    def chartColumns(self, request, tag):
+        return to_json_text(
+            ["Type"] +
+            [
+                date.strftime("%a %m/%d")
+                for date in sorted(self.incidents_by_date())
+            ]
+        )
+
+
+    @renderer
     def chartData(self, request, tag):
-        return self.data()
+        return self.data(labels=True)
 
 
     def data(self, labels=False, totals=False):
@@ -144,7 +155,8 @@ class DailyReportElement(BaseElement):
                 row.append("{0}".format(len(incidents)))
                 #row.append("{0} ({1})".format(len(incidents), ",".join((str(i.number) for i in incidents))))
 
-            row.append(len(incidents_by_type[incident_type]))
+            if totals:
+                row.append(len(incidents_by_type[incident_type]))
 
             unseen = incidents_by_type[incident_type] - seen
 
@@ -153,14 +165,16 @@ class DailyReportElement(BaseElement):
 
             rows.append(row)
 
+        row = ["Total"]
+        seen = set()
+        for date in sorted(incidents_by_date):
+            incidents = incidents_by_date[date]
+            seen |= incidents
+            row.append(len(incidents))
+
         if totals:
-            row = ["Total"]
-            seen = set()
-            for date in sorted(incidents_by_date):
-                incidents = incidents_by_date[date]
-                seen |= incidents
-                row.append(len(incidents))
             row.append(len(seen))
-            rows.append(row)
+
+        rows.append(row)
 
         return to_json_text(rows)
