@@ -147,6 +147,11 @@ class IncidentManagementSystem(object):
     @app.route("/incidents/<number>", methods=("POST",))
     @http_sauce
     def edit_incident(self, request, number):
+        if self.config.ReadOnly:
+            set_response_header(request, HeaderName.contentType, ContentType.plain)
+            request.setResponseCode(http.FORBIDDEN)
+            return "Server is in read-only mode."
+
         number = int(number)
         incident = self.storage.read_incident_with_number(number)
 
@@ -303,6 +308,11 @@ class IncidentManagementSystem(object):
     @app.route("/incidents/", methods=("POST",))
     @http_sauce
     def new_incident(self, request):
+        if self.config.ReadOnly:
+            set_response_header(request, HeaderName.contentType, ContentType.plain)
+            request.setResponseCode(http.FORBIDDEN)
+            return "Server is in read-only mode."
+
         incident = Incident.from_json_io(request.content, number=self.storage.next_incident_number())
 
         # Edit report entrys to add author
