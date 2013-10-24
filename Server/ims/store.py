@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -132,15 +132,22 @@ class ReadOnlyStorage(object):
         if self.incidents is None:
             incidents = {}
             for number in self._list_incidents():
-                # Here we cache that the number exists, but not the incident itself.
+                # Here we cache that the number exists, but not the incident
+                # itself.
                 incidents[number] = None
             self.incidents = incidents
-            
+
         for number in self.incidents:
             yield (number, self.etag_for_incident_with_number(number))
 
 
-    def search_incidents(self, terms=(), show_closed=False, since=None, until=None):
+    def search_incidents(
+        self,
+        terms=(),
+        show_closed=False,
+        since=None,
+        until=None,
+    ):
         #log.msg("Searching for {0!r}, closed={1}".format(terms, show_closed))
 
         #
@@ -194,7 +201,7 @@ class ReadOnlyStorage(object):
                         continue
                     if term.lower() in string.lower():
                         break
-                else: # Didn't match term
+                else:  # Didn't match term
                     break
             else:
                 yield (number, etag)
@@ -211,7 +218,9 @@ class ReadOnlyStorage(object):
             self.incident_etags[number] = etag
             return etag
         else:
-            raise StorageError("Unable to determine etag for incident {0}".format(number))
+            raise StorageError(
+                "Unable to determine etag for incident {0}".format(number)
+            )
 
 
     def read_incident_with_number_raw(self, number):

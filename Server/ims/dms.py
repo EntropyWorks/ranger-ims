@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -81,7 +81,7 @@ class DutyManagementSystem(object):
     """
     Duty Management System
     """
-    rangers_cache_interval = 60 * 60 * 1 # 1 hour
+    rangers_cache_interval = 60 * 60 * 1  # 1 hour
 
     def __init__(self, host, database, username, password):
         self.host     = host
@@ -94,7 +94,10 @@ class DutyManagementSystem(object):
         self.rangers_updating = False
 
         if not host or not database or not username or not password:
-            log.msg("Unsufficient database connection information for Duty Management System.")
+            log.msg(
+                "Unsufficient database connection information for "
+                "Duty Management System."
+            )
             self._dbpool = noDatabase
         else:
             self._dbpool = None
@@ -105,10 +108,10 @@ class DutyManagementSystem(object):
         if self._dbpool is None:
             self._dbpool = adbapi.ConnectionPool(
                 "mysql.connector",
-                host     = self.host,
-                database = self.database,
-                user     = self.username,
-                password = self.password,
+                host=self.host,
+                database=self.database,
+                user=self.username,
+                password=self.password,
             )
         return self._dbpool
 
@@ -152,7 +155,10 @@ class DutyManagementSystem(object):
         #
         # Ask the Ranger database for a list of Rangers.
         #
-        log.msg("{0} Retrieving Rangers from Duty Management System...".format(self))
+        log.msg(
+            "{0} Retrieving Rangers from Duty Management System..."
+            .format(self)
+        )
 
         d = self.dbpool.runQuery("""
             select callsign, first_name, mi, last_name, status

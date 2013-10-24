@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,7 +86,7 @@ class Configuration (object):
 
             if path is None:
                 fp = root
-                for segment in segments: 
+                for segment in segments:
                     fp = fp.child(segment)
 
             elif path.startswith("/"):
@@ -107,26 +107,43 @@ class Configuration (object):
         )
         log.msg("Server root: {0}".format(self.ServerRoot.path))
 
-        self.ConfigRoot = filePathFromConfig("Core", "ConfigRoot", self.ServerRoot, ("conf",))
+        self.ConfigRoot = filePathFromConfig(
+            "Core", "ConfigRoot",
+            self.ServerRoot, ("conf",)
+        )
         log.msg("Config root: {0}".format(self.ConfigRoot.path))
 
-        self.UserDB = filePathFromConfig("Core", "UserDB", self.ConfigRoot, ("users.pwdb",))
+        self.UserDB = filePathFromConfig(
+            "Core", "UserDB",
+            self.ConfigRoot, ("users.pwdb",)
+        )
         log.msg("User DB: {0}".format(self.UserDB.path))
 
-        self.DataRoot = filePathFromConfig("Core", "DataRoot", self.ServerRoot, ("data",))
+        self.DataRoot = filePathFromConfig(
+            "Core", "DataRoot",
+            self.ServerRoot, ("data",)
+        )
         log.msg("Data root: {0}".format(self.DataRoot.path))
 
-        self.Resources = filePathFromConfig("Core", "Resources", self.ServerRoot, ("resources",))
+        self.Resources = filePathFromConfig(
+            "Core", "Resources",
+            self.ServerRoot, ("resources",)
+        )
         log.msg("Resources: {0}".format(self.Resources.path))
 
         rejectClients = valueFromConfig("Core", "RejectClients", "")
         rejectClients = tuple([e for e in rejectClients.split("\n") if e])
-        
+
         self.RejectClients = rejectClients
-        self.RejectClientsRegex = tuple([regex_compile(e) for e in rejectClients])
+        self.RejectClientsRegex = tuple([
+            regex_compile(e)
+            for e in rejectClients
+        ])
         log.msg("RejectClients: {0}".format(self.RejectClients))
 
-        self.ReadOnly = (valueFromConfig("Core", "ReadOnly", "false") == "true")
+        self.ReadOnly = (
+            valueFromConfig("Core", "ReadOnly", "false") == "true"
+        )
 
         self.DMSHost     = valueFromConfig("DMS", "Hostname", None)
         self.DMSDatabase = valueFromConfig("DMS", "Database", None)
@@ -162,10 +179,10 @@ class Configuration (object):
         #
 
         self.dms = DutyManagementSystem(
-            host     = self.DMSHost,
-            database = self.DMSDatabase,
-            username = self.DMSUsername,
-            password = self.DMSPassword,
+            host=self.DMSHost,
+            database=self.DMSDatabase,
+            username=self.DMSUsername,
+            password=self.DMSPassword,
         )
 
         if self.ReadOnly:

@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,9 +70,13 @@ class IncidentManagementSystem(object):
     @app.route("/ping/", methods=("GET",))
     @http_sauce
     def ping(self, request):
-        ack="ack"
-        set_response_header(request, HeaderName.etag, ack)
-        set_response_header(request, HeaderName.contentType, ContentType.JSON)
+        ack = "ack"
+        set_response_header(
+            request, HeaderName.etag, ack
+        )
+        set_response_header(
+            request, HeaderName.contentType, ContentType.JSON
+        )
         return to_json_text(ack)
 
 
@@ -80,22 +84,27 @@ class IncidentManagementSystem(object):
     @app.route("/rangers/", methods=("GET",))
     @http_sauce
     def list_rangers(self, request):
-        set_response_header(request, HeaderName.etag, str(self.dms.rangers_updated))
-        set_response_header(request, HeaderName.contentType, ContentType.JSON)
+        set_response_header(
+            request, HeaderName.etag, str(self.dms.rangers_updated)
+        )
+        set_response_header(
+            request, HeaderName.contentType, ContentType.JSON
+        )
 
         d = self.dms.rangers()
-        d.addCallback(lambda rangers:
+        d.addCallback(
+            lambda rangers:
             to_json_text(tuple(
                 {
                     "handle": ranger.handle,
-                    "name"  : ranger.name,
+                    "name": ranger.name,
                     "status": ranger.status,
                 }
                 for ranger in rangers
             ))
         )
 
-        return d              
+        return d
 
     @app.route("/incident_types", methods=("GET",))
     @app.route("/incident_types/", methods=("GET",))
@@ -114,7 +123,7 @@ class IncidentManagementSystem(object):
         set_response_header(request, HeaderName.contentType, ContentType.JSON)
         return to_json_text(sorted(
             incidents_from_query(self, request),
-            cmp = lambda a,b: cmp(a[0], b[0]), reverse = True,
+            cmp=lambda a, b: cmp(a[0], b[0]), reverse=True,
         ))
 
 
@@ -125,8 +134,13 @@ class IncidentManagementSystem(object):
         #import time
         #time.sleep(0.3)
 
-        set_response_header(request, HeaderName.etag, self.storage.etag_for_incident_with_number(number))
-        set_response_header(request, HeaderName.contentType, ContentType.JSON)
+        set_response_header(
+            request, HeaderName.etag,
+            self.storage.etag_for_incident_with_number(number)
+        )
+        set_response_header(
+            request, HeaderName.contentType, ContentType.JSON
+        )
 
         if False:
             #
@@ -148,7 +162,9 @@ class IncidentManagementSystem(object):
     @http_sauce
     def edit_incident(self, request, number):
         if self.config.ReadOnly:
-            set_response_header(request, HeaderName.contentType, ContentType.plain)
+            set_response_header(
+                request, HeaderName.contentType, ContentType.plain
+            )
             request.setResponseCode(http.FORBIDDEN)
             return "Server is in read-only mode."
 
@@ -171,14 +187,20 @@ class IncidentManagementSystem(object):
                 return
 
             if old == new:
-                #print "Client submitted unchaged value for {0}: {1}".format(JSON.describe(key), new)
+                # print (
+                #     "Client submitted unchaged value for {0}: {1}"
+                #     .format(JSON.describe(key), new)
+                # )
                 return
 
             if key in JSON.states():
                 state_changes.append((key, new))
                 return
 
-            system_messages.append(u"Changed {0} to: {1}".format(JSON.describe(key), new if new else u"<no value>"))
+            system_messages.append(
+                u"Changed {0} to: {1}"
+                .format(JSON.describe(key), new if new else u"<no value>")
+            )
 
         def diff_set(key, old, new):
             old = frozenset(old if old else ())
@@ -190,18 +212,29 @@ class IncidentManagementSystem(object):
 
         def log_edit_set(key, added, removed):
             if added:
-                system_messages.append(u"Added to {0}: {1}".format(JSON.describe(key), ", ".join(added)))
+                system_messages.append(
+                    u"Added to {0}: {1}"
+                    .format(JSON.describe(key), ", ".join(added))
+                )
             if removed:
-                system_messages.append(u"Removed from {0}: {1}".format(JSON.describe(key), ", ".join(removed)))
+                system_messages.append(
+                    u"Removed from {0}: {1}"
+                    .format(JSON.describe(key), ", ".join(removed))
+                )
 
         def close_incident(incident=incident, edits=edits):
             now = DateTime.now()
-            for key in (JSON.created, JSON.dispatched, JSON.on_scene, JSON.closed):
+            for key in (
+                JSON.created,
+                JSON.dispatched,
+                JSON.on_scene,
+                JSON.closed,
+            ):
                 attr_name = key.name
 
                 if (
                     getattr(incident, attr_name) is None and
-                    getattr(edits   , attr_name) is None
+                    getattr(edits, attr_name) is None
                 ):
                     log_edit_value(key, getattr(incident, attr_name), now)
                     setattr(incident, attr_name, now)
@@ -217,22 +250,39 @@ class IncidentManagementSystem(object):
                         user_entries.append(entry)
             elif key is JSON.location_name:
                 if edits.location.name is not None:
-                    log_edit_value(key, incident.location.name, edits.location.name)
+                    log_edit_value(
+                        key, incident.location.name, edits.location.name
+                    )
                     incident.location.name = edits.location.name
             elif key is JSON.location_address:
                 if edits.location.address is not None:
-                    log_edit_value(key, incident.location.address, edits.location.address)
+                    log_edit_value(
+                        key, incident.location.address, edits.location.address
+                    )
                     incident.location.address = edits.location.address
             elif key is JSON.ranger_handles:
                 if edits.rangers is not None:
-                    added, removed = diff_set(key, incident.rangers, edits.rangers)
-                    log_edit_set(key, [r.handle for r in added], [r.handle for r in removed])
+                    added, removed = diff_set(
+                        key, incident.rangers, edits.rangers
+                    )
+                    log_edit_set(
+                        key,
+                        [r.handle for r in added],
+                        [r.handle for r in removed]
+                    )
                     incident.rangers = edits.rangers
             elif key is JSON.incident_types:
                 if edits.incident_types is not None:
-                    log_edit_set(key, *diff_set(key, incident.incident_types, edits.incident_types))
+                    log_edit_set(
+                        key, *diff_set(
+                            key, incident.incident_types, edits.incident_types
+                        )
+                    )
 
-                    if IncidentType.Junk.value in (frozenset(edits.incident_types) - frozenset(incident.incident_types)):
+                    if IncidentType.Junk.value in (
+                        frozenset(edits.incident_types) -
+                        frozenset(incident.incident_types)
+                    ):
                         # Junk was added as an incident type; let's close.
                         close_incident()
 
@@ -241,7 +291,12 @@ class IncidentManagementSystem(object):
                 attr_name = key.name
                 attr_value = getattr(edits, attr_name)
 
-                if key in (JSON.created, JSON.dispatched, JSON.on_scene, JSON.closed):
+                if key in (
+                    JSON.created,
+                    JSON.dispatched,
+                    JSON.on_scene,
+                    JSON.closed,
+                ):
                     if edits.created is None:
                         # If created is None, then we aren't editing state.
                         # (It would be weird if others were not None here.)
@@ -261,14 +316,23 @@ class IncidentManagementSystem(object):
         lowest_change = None
         for state_changed, state_time in state_changes:
             if state_time is None:
-                if lowest_change is None or JSON.cmpStates(lowest_change, state_changed) > 0:
+                if (
+                    lowest_change is None or
+                    JSON.cmpStates(lowest_change, state_changed) > 0
+                ):
                     lowest_change = state_changed
             else:
-                if highest_change is None or JSON.cmpStates(highest_change[0], state_changed) < 0:
+                if (
+                    highest_change is None or
+                    JSON.cmpStates(highest_change[0], state_changed) < 0
+                ):
                     highest_change = (state_changed, state_time)
 
         if highest_change is not None:
-            system_messages.append(u"State changed to: {0}".format(JSON.describe(highest_change[0])))
+            system_messages.append(
+                u"State changed to: {0}"
+                .format(JSON.describe(highest_change[0]))
+            )
         elif lowest_change is not None:
             # We need one state less than lowest_change
             last = None
@@ -276,7 +340,10 @@ class IncidentManagementSystem(object):
                 if state == lowest_change:
                     break
                 last = state
-            system_messages.append(u"State changed to: {0}".format(JSON.describe(last)))
+            system_messages.append(
+                u"State changed to: {0}"
+                .format(JSON.describe(last))
+            )
 
         #
         # Add system report entries, then user entries
@@ -284,9 +351,9 @@ class IncidentManagementSystem(object):
         if system_messages:
             incident.report_entries.append(
                 ReportEntry(
-                    author = self.avatarId.decode("utf-8"),
-                    text = u"\n".join(system_messages),
-                    system_entry = True,
+                    author=self.avatarId.decode("utf-8"),
+                    text=u"\n".join(system_messages),
+                    system_entry=True,
                 )
             )
         incident.report_entries.extend(user_entries)
@@ -302,18 +369,22 @@ class IncidentManagementSystem(object):
         set_response_header(request, HeaderName.contentType, ContentType.JSON)
         request.setResponseCode(http.OK)
 
-        return "";
+        return ""
 
 
     @app.route("/incidents/", methods=("POST",))
     @http_sauce
     def new_incident(self, request):
         if self.config.ReadOnly:
-            set_response_header(request, HeaderName.contentType, ContentType.plain)
+            set_response_header(
+                request, HeaderName.contentType, ContentType.plain
+            )
             request.setResponseCode(http.FORBIDDEN)
             return "Server is in read-only mode."
 
-        incident = Incident.from_json_io(request.content, number=self.storage.next_incident_number())
+        incident = Incident.from_json_io(
+            request.content, number=self.storage.next_incident_number()
+        )
 
         # Edit report entrys to add author
         for entry in incident.report_entries:
@@ -332,7 +403,7 @@ class IncidentManagementSystem(object):
             url_for(request, "get_incident", {"number": incident.number})
         )
 
-        return "";
+        return ""
 
 
     #
@@ -346,14 +417,18 @@ class IncidentManagementSystem(object):
         if not request.args:
             request.args["show_closed"] = ["false"]
 
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        set_response_header(
+            request, HeaderName.contentType, ContentType.HTML
+        )
         return DispatchQueueElement(self)
 
 
     @app.route("/queue/incidents/<number>", methods=("GET",))
     @http_sauce
     def queue_incident(self, request, number):
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        set_response_header(
+            request, HeaderName.contentType, ContentType.HTML
+        )
         return IncidentElement(self, number)
 
 
@@ -375,7 +450,9 @@ class IncidentManagementSystem(object):
     @app.route("/", methods=("GET",))
     @http_sauce
     def root(self, request):
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        set_response_header(
+            request, HeaderName.contentType, ContentType.HTML
+        )
         return HomePageElement(self)
 
 
@@ -393,11 +470,15 @@ class IncidentManagementSystem(object):
 
         if filePath.exists():
             if name.endswith(".xhtml"):
-                set_response_header(request, HeaderName.contentType, ContentType.HTML)
+                set_response_header(
+                    request, HeaderName.contentType, ContentType.HTML
+                )
                 return FileElement(filePath)
 
         request.setResponseCode(http.NOT_FOUND)
-        set_response_header(request, HeaderName.contentType, ContentType.plain)
+        set_response_header(
+            request, HeaderName.contentType, ContentType.plain
+        )
         return "Not found."
 
 
@@ -408,21 +489,27 @@ class IncidentManagementSystem(object):
     @app.route("/reports/daily", methods=("GET",))
     @http_sauce
     def daily_report(self, request):
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        set_response_header(
+            request, HeaderName.contentType, ContentType.HTML
+        )
         return DailyReportElement(self)
 
 
     @app.route("/charts/daily", methods=("GET",))
     @http_sauce
     def daily_chart(self, request):
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        set_response_header(
+            request, HeaderName.contentType, ContentType.HTML
+        )
         return DailyReportElement(self, template_name="chart_daily")
 
 
     @app.route("/reports/shift", methods=("GET",))
     @http_sauce
     def shift_report(self, request):
-        set_response_header(request, HeaderName.contentType, ContentType.HTML)
+        set_response_header(
+            request, HeaderName.contentType, ContentType.HTML
+        )
         return ShiftReportElement(self)
 
 
@@ -437,12 +524,12 @@ class IncidentManagementSystem(object):
         #set_response_header(request, HeaderName.etag, ????)
         set_response_header(request, HeaderName.contentType, ContentType.JSON)
         return to_json_text([
-            { JSON.name.value: name, JSON.url.value: value }
+            {JSON.name.value: name, JSON.url.value: value}
             for name, value in (
-                ( "Home page"                     , "/"              ),
-                ( "Dispatch Queue"                , "/queue"         ),
-                ( "Daily Incident Summary (Table)", "/reports/daily" ),
-                ( "Daily Incident Summary (Chart)", "/charts/daily"  ),
+                ("Home page", "/"),
+                ("Dispatch Queue", "/queue"),
+                ("Daily Incident Summary (Table)", "/reports/daily"),
+                ("Daily Incident Summary (Chart)", "/charts/daily"),
             )
         ])
 
@@ -483,11 +570,13 @@ class IncidentManagementSystem(object):
         return self.cachedResource(name, url)
 
 
+    _tidy_base_url = "https://raw.github.com/nuxy/Tidy-Table/v1.4/"
+
     @app.route("/tidy.js", methods=("GET",))
     @http_sauce
     def tidy(self, request):
         name = "tidy.js"
-        url = "https://raw.github.com/nuxy/Tidy-Table/v1.4/jquery.tidy.table.min.js"
+        url = self._tidy_base_url + "jquery.tidy.table.min.js"
         return self.cachedResource(name, url)
 
 
@@ -495,7 +584,7 @@ class IncidentManagementSystem(object):
     @http_sauce
     def tidy_css(self, request):
         name = "tidy.css"
-        url = "https://raw.github.com/nuxy/Tidy-Table/v1.4/jquery.tidy.table.min.css"
+        url = self._tidy_base_url + "jquery.tidy.table.min.css"
         return self.cachedResource(name, url)
 
 
@@ -503,7 +592,7 @@ class IncidentManagementSystem(object):
     @http_sauce
     def tidy_asc(self, request):
         name = "tidy-asc.gif"
-        url = "https://raw.github.com/nuxy/Tidy-Table/v1.4/images/arrow_asc.gif"
+        url = self._tidy_base_url + "images/arrow_asc.gif"
         return self.cachedResource(name, url)
 
 
@@ -511,7 +600,7 @@ class IncidentManagementSystem(object):
     @http_sauce
     def tidy_desc(self, request):
         name = "tidy-desc.gif"
-        url = "https://raw.github.com/nuxy/Tidy-Table/v1.4/images/arrow_desc.gif"
+        url = self._tidy_base_url + "images/arrow_desc.gif"
         return self.cachedResource(name, url)
 
 
@@ -566,7 +655,9 @@ class IncidentManagementSystem(object):
         def notFoundHandler(f):
             f.trap(KeyError)
             request.setResponseCode(http.NOT_FOUND)
-            set_response_header(request, HeaderName.contentType, ContentType.plain)
+            set_response_header(
+                request, HeaderName.contentType, ContentType.plain
+            )
             return "Not found."
 
         d.addCallback(readFromArchive)

@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,14 +74,20 @@ class IncidentTests(twisted.trial.unittest.TestCase):
         L{ims.data.Incident.from_json_io} requires a non-C{None}
         number.
         """
-        self.assertRaises(TypeError, Incident.from_json_io, StringIO(incident1_text))
+        self.assertRaises(
+            TypeError,
+            Incident.from_json_io, StringIO(incident1_text)
+        )
 
 
     def test_from_json_no_number(self):
         """
         L{ims.data.Incident.from_json} requires a non-C{None} number.
         """
-        self.assertRaises(TypeError, Incident.from_json, from_json_text(incident1_text))
+        self.assertRaises(
+            TypeError,
+            Incident.from_json, from_json_text(incident1_text)
+        )
 
 
     def test_str(self):
@@ -89,7 +95,10 @@ class IncidentTests(twisted.trial.unittest.TestCase):
         L{ims.data.Incident.__str__}
         """
         incident = Incident.from_json_text(incident1_text, 1)
-        self.assertEquals(str(incident), "{i.number}: {i.summary}".format(i=incident))
+        self.assertEquals(
+            str(incident),
+            "{i.number}: {i.summary}".format(i=incident)
+        )
 
 
     def test_repr(self):
@@ -284,12 +293,18 @@ class IncidentTests(twisted.trial.unittest.TestCase):
                 ReportEntry(
                     created=datetime(2013, 3, 21, 19, 18, 42),
                     author=u"Tool",
-                    text=u"Art car knocked out a spire at couple of posts toward temple from the Man.",
+                    text=(
+                        u"Art car knocked out a spire at couple of "
+                        u"posts toward temple from the Man."
+                    ),
                 ),
                 ReportEntry(
                     created=datetime(2013, 3, 21, 20, 14, 11),
                     author=u"Tool",
-                    text=u"Intercept: lamp post is bent, rebar is broken.  Khaki has notified DPW.  ETA unknown.",
+                    text=(
+                        u"Intercept: lamp post is bent, rebar is broken.  "
+                        u"Khaki has notified DPW.  ETA unknown."
+                    ),
                 ),
                 ReportEntry(
                     created=datetime(2013, 3, 21, 21, 41, 40),
@@ -299,15 +314,33 @@ class IncidentTests(twisted.trial.unittest.TestCase):
                 ReportEntry(
                     created=datetime(2013, 3, 21, 22, 0, 10),
                     author=u"Splinter",
-                    text=u"Tulsa: got some help, dealt with it, may need some lighting, but code 4.",
+                    text=(
+                        u"Tulsa: got some help, dealt with it, may need "
+                        u"some lighting, but code 4."
+                    ),
                 ),
             ]
         )
-        self.assertEquals(incident.created   , datetime(2013, 3, 21, 19, 16,  0))
-        self.assertEquals(incident.dispatched, datetime(2013, 3, 21, 20, 55, 11))
-        self.assertEquals(incident.on_scene  , datetime(2013, 3, 21, 20, 55, 11))
-        self.assertEquals(incident.closed    , datetime(2013, 3, 21, 22,  0, 17))
-        self.assertEquals(incident.priority  , 2)
+        self.assertEquals(
+            incident.created,
+            datetime(2013, 3, 21, 19, 16, 0)
+        )
+        self.assertEquals(
+            incident.dispatched,
+            datetime(2013, 3, 21, 20, 55, 11)
+        )
+        self.assertEquals(
+            incident.on_scene,
+            datetime(2013, 3, 21, 20, 55, 11)
+        )
+        self.assertEquals(
+            incident.closed,
+            datetime(2013, 3, 21, 22, 0, 17)
+        )
+        self.assertEquals(
+            incident.priority,
+            2
+        )
 
 
 
@@ -321,11 +354,14 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         L{ims.data.ReportEntry.__str__}
         """
         entry = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
-        self.assertEquals(str(entry), "Tool@1972-06-29 12:00:00: Something happened!")
+        self.assertEquals(
+            str(entry),
+            "Tool@1972-06-29 12:00:00: Something happened!"
+        )
 
 
     def test_repr(self):
@@ -333,9 +369,9 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         L{ims.data.ReportEntry.__repr__}
         """
         entry = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
         self.assertEquals(
             repr(entry),
@@ -352,14 +388,14 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         L{ims.data.ReportEntry.__eq__} between two different entries.
         """
         entry1 = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
         entry2 = ReportEntry(
-            author = u"Tool",
-            text = u"Something else happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something else happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
 
         self.assertNotEquals(entry1, entry2)
@@ -370,14 +406,14 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         L{ims.data.ReportEntry.__eq__} between equal entries.
         """
         entry1a = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
         entry1b = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
 
         self.assertEquals(entry1a, entry1a)
@@ -389,9 +425,9 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         L{ims.data.ReportEntry.__eq__} between entry and other type.
         """
         entry = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
 
         self.assertNotEquals(entry, object())
@@ -402,9 +438,9 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         L{ims.data.ReportEntry.validate} of valid entry.
         """
         entry = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
 
         entry.validate()
@@ -416,9 +452,9 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         author.
         """
         entry = ReportEntry(
-            author = b"Tool",
-            text = u"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=b"Tool",
+            text=u"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
 
         self.assertRaises(InvalidDataError, entry.validate)
@@ -430,9 +466,9 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         text.
         """
         entry = ReportEntry(
-            author = u"Tool",
-            text = b"Something happened!",
-            created = datetime(1972, 06, 29, 12,  0, 0),
+            author=u"Tool",
+            text=b"Something happened!",
+            created=datetime(1972, 06, 29, 12,  0, 0),
         )
 
         self.assertRaises(InvalidDataError, entry.validate)
@@ -444,9 +480,9 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         created time.
         """
         entry = ReportEntry(
-            author = u"Tool",
-            text = u"Something happened!",
-            created = 0,
+            author=u"Tool",
+            text=u"Something happened!",
+            created=0,
         )
 
         self.assertRaises(InvalidDataError, entry.validate)
@@ -459,15 +495,15 @@ class RangerTests(twisted.trial.unittest.TestCase):
     """
 
     tool = Ranger(
-        handle = u"Tool",
-        name = u"Wilfredo Sanchez Vega",
-        status = "vintage",
+        handle=u"Tool",
+        name=u"Wilfredo Sanchez Vega",
+        status="vintage",
     )
 
     tulsa = Ranger(
-        handle = u"Tulsa",
-        name = u"Curtis Kline",
-        status = "vintage",
+        handle=u"Tulsa",
+        name=u"Curtis Kline",
+        status="vintage",
     )
 
 
@@ -484,7 +520,8 @@ class RangerTests(twisted.trial.unittest.TestCase):
         """
         self.assertEquals(
             repr(self.tool),
-            "Ranger(handle=u'Tool',name=u'Wilfredo Sanchez Vega',status='vintage')"
+            "Ranger(handle=u'Tool',name=u'Wilfredo Sanchez Vega',"
+            "status='vintage')"
         )
 
 
@@ -500,14 +537,14 @@ class RangerTests(twisted.trial.unittest.TestCase):
         L{ims.data.Ranger.__eq__} between equal entries.
         """
         ranger1a = Ranger(
-            handle = u"Tulsa",
-            name = u"Curtis Kline",
-            status = "vintage",
+            handle=u"Tulsa",
+            name=u"Curtis Kline",
+            status="vintage",
         )
         ranger1b = Ranger(
-            handle = u"Tulsa",
-            name = u"Curtis Kline",
-            status = "vintage",
+            handle=u"Tulsa",
+            name=u"Curtis Kline",
+            status="vintage",
         )
 
         self.assertEquals(ranger1a, ranger1a)
@@ -534,9 +571,9 @@ class RangerTests(twisted.trial.unittest.TestCase):
         handle.
         """
         ranger = Ranger(
-            handle = b"Tulsa",
-            name = u"Curtis Kline",
-            status = "vintage",
+            handle=b"Tulsa",
+            name=u"Curtis Kline",
+            status="vintage",
         )
 
         self.assertRaises(InvalidDataError, ranger.validate)
@@ -547,9 +584,9 @@ class RangerTests(twisted.trial.unittest.TestCase):
         L{ims.data.Ranger.validate} of Ranger with non-unicode name.
         """
         ranger = Ranger(
-            handle = u"Tulsa",
-            name = b"Curtis Kline",
-            status = "vintage",
+            handle=u"Tulsa",
+            name=b"Curtis Kline",
+            status="vintage",
         )
 
         self.assertRaises(InvalidDataError, ranger.validate)
@@ -562,13 +599,13 @@ class LocationTests(twisted.trial.unittest.TestCase):
     """
 
     hq = Location(
-        name = u"Ranger HQ",
-        address = u"5:45 & Esplanade",
+        name=u"Ranger HQ",
+        address=u"5:45 & Esplanade",
     )
 
     man = Location(
-        name = u"The Man",
-        address = u"The Man",
+        name=u"The Man",
+        address=u"The Man",
     )
 
 
@@ -601,12 +638,12 @@ class LocationTests(twisted.trial.unittest.TestCase):
         L{ims.data.Location.__eq__} between equal entries.
         """
         location1a = Location(
-            name = u"Ranger HQ",
-            address = u"5:45 & Esplanade",
+            name=u"Ranger HQ",
+            address=u"5:45 & Esplanade",
         )
         location1b = Location(
-            name = u"Ranger HQ",
-            address = u"5:45 & Esplanade", 
+            name=u"Ranger HQ",
+            address=u"5:45 & Esplanade",
         )
 
         self.assertEquals(location1a, location1a)
@@ -632,8 +669,8 @@ class LocationTests(twisted.trial.unittest.TestCase):
         L{ims.data.Location.validate} of location with non-unicode name.
         """
         location = Location(
-            name = b"Ranger HQ",
-            address = u"5:45 & Esplanade",
+            name=b"Ranger HQ",
+            address=u"5:45 & Esplanade",
         )
 
         self.assertRaises(InvalidDataError, location.validate)
@@ -645,8 +682,8 @@ class LocationTests(twisted.trial.unittest.TestCase):
         address.
         """
         location = Location(
-            name = u"Ranger HQ",
-            address = b"5:45 & Esplanade",
+            name=u"Ranger HQ",
+            address=b"5:45 & Esplanade",
         )
 
         self.assertRaises(InvalidDataError, location.validate)
@@ -659,41 +696,44 @@ class LocationTests(twisted.trial.unittest.TestCase):
 
 incident1_text = """
 {
-    "closed": "2013-03-21T22:00:17Z", 
-    "created": "2013-03-21T19:16:00Z", 
-    "dispatched": "2013-03-21T20:55:11Z", 
+    "closed": "2013-03-21T22:00:17Z",
+    "created": "2013-03-21T19:16:00Z",
+    "dispatched": "2013-03-21T20:55:11Z",
     "incident_types": [
         "Vehicle"
-    ], 
-    "location_address": "A couple of posts towards the temple from the Man", 
-    "location_name": "Near the Man", 
-    "number": 1, 
-    "on_scene": "2013-03-21T20:55:11Z", 
-    "priority": 2, 
+    ],
+    "location_address": "A couple of posts towards the temple from the Man",
+    "location_name": "Near the Man",
+    "number": 1,
+    "on_scene": "2013-03-21T20:55:11Z",
+    "priority": 2,
     "ranger_handles": [
         "Tulsa"
-    ], 
+    ],
     "report_entries": [
         {
             "author": "Tool",
-            "created": "2013-03-21T19:18:42Z", 
-            "text": "Art car knocked out a spire at couple of posts toward temple from the Man."
-        }, 
+            "created": "2013-03-21T19:18:42Z",
+            "text":
+                "Art car knocked out a spire at couple of posts toward temple from the Man."
+        },
         {
             "author": "Tool",
-            "created": "2013-03-21T20:14:11Z", 
-            "text": "Intercept: lamp post is bent, rebar is broken.  Khaki has notified DPW.  ETA unknown."
-        }, 
+            "created": "2013-03-21T20:14:11Z",
+            "text":
+                "Intercept: lamp post is bent, rebar is broken.  Khaki has notified DPW.  ETA unknown."
+        },
         {
-            "created": "2013-03-21T21:41:40Z", 
+            "created": "2013-03-21T21:41:40Z",
             "text": "Tulsa is hanging out until eyes on art arrives."
-        }, 
+        },
         {
             "author": "Splinter",
-            "created": "2013-03-21T22:00:10Z", 
-            "text": "Tulsa: got some help, dealt with it, may need some lighting, but code 4."
+            "created": "2013-03-21T22:00:10Z",
+            "text":
+                "Tulsa: got some help, dealt with it, may need some lighting, but code 4."
         }
-    ], 
+    ],
     "summary": "Knocked out spire"
 }
 """

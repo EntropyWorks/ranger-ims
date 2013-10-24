@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,9 @@ from ims.protocol import IncidentManagementSystem
 
 
 def loadConfig():
-    configFile = FilePath(__file__).parent().parent().child("conf").child("imsd.conf")
+    configFile = (
+        FilePath(__file__).parent().parent().child("conf").child("imsd.conf")
+    )
     return Configuration(configFile)
 
 
@@ -51,7 +53,8 @@ def Resource():
     )
 
 
-# Monkey patch twisted.web logging, which annoyingly doesn't let you log the username.
+# Monkey patch twisted.web logging, which annoyingly doesn't let you log the
+# username.
 def logAccess(self, request):
     if hasattr(self, "logFile"):
         if hasattr(request, "user") and request.user:
@@ -66,16 +69,16 @@ def logAccess(self, request):
             '"{referer}" "{agent}"'
             '\n'
         ).format(
-            ip = request.getClientIP(),
-            user = user,
-            time = self._logDateTime,
-            method = self._escape(request.method),
-            uri = self._escape(request.uri),
-            proto = self._escape(request.clientproto),
-            status = request.code,
-            length = request.sentLength or "-",
-            referer = self._escape(request.getHeader("referer") or "-"),
-            agent = self._escape(request.getHeader("user-agent") or "-"),
+            ip=request.getClientIP(),
+            user=user,
+            time=self._logDateTime,
+            method=self._escape(request.method),
+            uri=self._escape(request.uri),
+            proto=self._escape(request.clientproto),
+            status=request.code,
+            length=request.sentLength or "-",
+            referer=self._escape(request.getHeader("referer") or "-"),
+            agent=self._escape(request.getHeader("user-agent") or "-"),
         )
         self.logFile.write(line)
 

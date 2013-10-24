@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,7 +63,12 @@ class JSON(Values):
     @classmethod
     def states(cls):
         if not hasattr(cls, "_states"):
-            cls._states = (cls.created, cls.dispatched, cls.on_scene, cls.closed)
+            cls._states = (
+                cls.created,
+                cls.dispatched,
+                cls.on_scene,
+                cls.closed,
+            )
         return cls._states
 
     @classmethod
@@ -129,7 +134,10 @@ class Incident(object):
 
         if json_number is not None:
             if json_number != number:
-                raise InvalidDataError("Incident number may not be modified: {0} != {1}".format(json_number, number))
+                raise InvalidDataError(
+                    "Incident number may not be modified: {0} != {1}"
+                    .format(json_number, number)
+                )
 
             root[JSON.number.value] = number
 
@@ -143,8 +151,8 @@ class Incident(object):
                 return DateTime.strptime(rfc3339, rfc3339_date_time_format)
 
         location = Location(
-            name    = root.get(JSON.location_name.value   , None),
-            address = root.get(JSON.location_address.value, None),
+            name=root.get(JSON.location_name.value, None),
+            address=root.get(JSON.location_address.value, None),
         )
 
         ranger_handles = root.get(JSON.ranger_handles.value, None)
@@ -158,26 +166,26 @@ class Incident(object):
 
         report_entries = [
             ReportEntry(
-                author = entry.get(JSON.author.value, u"<unknown>"),
-                text = entry.get(JSON.text.value, None),
-                created = parse_date(entry.get(JSON.created.value, None)),
-                system_entry = entry.get(JSON.system_entry.value, False),
+                author=entry.get(JSON.author.value, u"<unknown>"),
+                text=entry.get(JSON.text.value, None),
+                created=parse_date(entry.get(JSON.created.value, None)),
+                system_entry=entry.get(JSON.system_entry.value, False),
             )
             for entry in root.get(JSON.report_entries.value, ())
         ]
 
         incident = cls(
-            number         = number,
-            priority       = root.get(JSON.priority.value, None),
-            summary        = root.get(JSON.summary.value, None),
-            location       = location,
-            rangers        = rangers,
-            incident_types = root.get(JSON.incident_types.value, None),
-            report_entries = report_entries,
-            created        = parse_date(root.get(JSON.created.value, None)),
-            dispatched     = parse_date(root.get(JSON.dispatched.value, None)),
-            on_scene       = parse_date(root.get(JSON.on_scene.value, None)),
-            closed         = parse_date(root.get(JSON.closed.value, None)),
+            number=number,
+            priority=root.get(JSON.priority.value, None),
+            summary=root.get(JSON.summary.value, None),
+            location=location,
+            rangers=rangers,
+            incident_types=root.get(JSON.incident_types.value, None),
+            report_entries=report_entries,
+            created=parse_date(root.get(JSON.created.value, None)),
+            dispatched=parse_date(root.get(JSON.dispatched.value, None)),
+            on_scene=parse_date(root.get(JSON.on_scene.value, None)),
+            closed=parse_date(root.get(JSON.closed.value, None)),
         )
 
         if validate:
@@ -198,7 +206,9 @@ class Incident(object):
     ):
         if type(number) is not int:
             raise InvalidDataError(
-                "Incident number must be an int, not ({n.__class__.__name__}){n}".format(n=number)
+                "Incident number must be an int, not "
+                "({n.__class__.__name__}){n}"
+                .format(n=number)
             )
 
         if number < 0:
@@ -276,26 +286,44 @@ class Incident(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
-                self.number         == other.number         and
-                self.rangers        == other.rangers        and
-                self.location       == other.location       and
+                self.number == other.number and
+                self.rangers == other.rangers and
+                self.location == other.location and
                 self.incident_types == other.incident_types and
-                self.summary        == other.summary        and
+                self.summary == other.summary and
                 self.report_entries == other.report_entries and
-                self.created        == other.created        and
-                self.dispatched     == other.dispatched     and
-                self.on_scene       == other.on_scene       and
-                self.closed         == other.closed         and
-                self.priority       == other.priority
+                self.created == other.created and
+                self.dispatched == other.dispatched and
+                self.on_scene == other.on_scene and
+                self.closed == other.closed and
+                self.priority == other.priority
             )
         else:
             return NotImplemented
 
 
-    def __lt__(self, other): return self.number <  other.number if isinstance(other, Incident) else NotImplemented
-    def __le__(self, other): return self.number <= other.number if isinstance(other, Incident) else NotImplemented
-    def __gt__(self, other): return self.number >  other.number if isinstance(other, Incident) else NotImplemented
-    def __ge__(self, other): return self.number >= other.number if isinstance(other, Incident) else NotImplemented
+    def __lt__(self, other):
+        if not isinstance(other, Incident):
+            return NotImplemented
+        return self.number < other.number
+
+
+    def __le__(self, other):
+        if not isinstance(other, Incident):
+            return NotImplemented
+        return self.number <= other.number
+
+
+    def __gt__(self, other):
+        if not isinstance(other, Incident):
+            return NotImplemented
+        return self.number > other.number
+
+
+    def __ge__(self, other):
+        if not isinstance(other, Incident):
+            return NotImplemented
+        return self.number >= other.number
 
 
     def summaryFromReport(self):
@@ -325,46 +353,69 @@ class Incident(object):
             for incident_type in self.incident_types:
                 if type(incident_type) is not unicode:
                     raise InvalidDataError(
-                        "Incident type must be unicode, not {0!r}".format(incident_type)
+                        "Incident type must be unicode, not {0!r}"
+                        .format(incident_type)
                     )
 
-        if self.summary is not None and type(self.summary) is not unicode:
+        if (
+            self.summary is not None and
+            type(self.summary) is not unicode
+        ):
             raise InvalidDataError(
-                "Incident summary must be unicode, not {0!r}".format(self.summary)
+                "Incident summary must be unicode, not {0!r}"
+                .format(self.summary)
             )
 
         if self.report_entries is not None:
             for report_entry in self.report_entries:
                 report_entry.validate()
 
-        if self.created is not None and type(self.created) is not DateTime:
+        if (
+            self.created is not None and
+            type(self.created) is not DateTime
+        ):
             raise InvalidDataError(
-                "Incident created date must be a DateTime, not {0!r}".format(self.created)
+                "Incident created date must be a DateTime, not {0!r}"
+                .format(self.created)
             )
 
-        if self.dispatched is not None and type(self.dispatched) is not DateTime:
+        if (
+            self.dispatched is not None and
+            type(self.dispatched) is not DateTime
+        ):
             raise InvalidDataError(
-                "Incident dispatched date must be a DateTime, not {0!r}".format(self.dispatched)
+                "Incident dispatched date must be a DateTime, not {0!r}"
+                .format(self.dispatched)
             )
 
-        if self.on_scene is not None and type(self.on_scene) is not DateTime:
+        if (
+            self.on_scene is not None and
+            type(self.on_scene) is not DateTime
+        ):
             raise InvalidDataError(
-                "Incident on_scene date must be a DateTime, not {0!r}".format(self.on_scene)
+                "Incident on_scene date must be a DateTime, not {0!r}"
+                .format(self.on_scene)
             )
 
-        if self.closed is not None and type(self.closed) is not DateTime:
+        if (
+            self.closed is not None and
+            type(self.closed) is not DateTime
+        ):
             raise InvalidDataError(
-                "Incident closed date must be a DateTime, not {0!r}".format(self.closed)
+                "Incident closed date must be a DateTime, not {0!r}"
+                .format(self.closed)
             )
 
         if type(self.priority) is not int:
             raise InvalidDataError(
-                "Incident priority must be an int, not {0!r}".format(self.priority)
+                "Incident priority must be an int, not {0!r}"
+                .format(self.priority)
             )
 
         if not 1 <= self.priority <= 5:
             raise InvalidDataError(
-                "Incident priority must be an int, not {0!r}".format(self.priority)
+                "Incident priority must be an int, not {0!r}"
+                .format(self.priority)
             )
 
         return self
@@ -384,19 +435,21 @@ class Incident(object):
         else:
             incident_types = self.incident_types
 
-        root[JSON.number.value          ] = self.number
-        root[JSON.priority.value        ] = self.priority
-        root[JSON.summary.value         ] = self.summary
-        root[JSON.location_name.value   ] = self.location.name
+        root[JSON.number.value] = self.number
+        root[JSON.priority.value] = self.priority
+        root[JSON.summary.value] = self.summary
+        root[JSON.location_name.value] = self.location.name
         root[JSON.location_address.value] = self.location.address
-        root[JSON.incident_types.value  ] = incident_types
+        root[JSON.incident_types.value] = incident_types
 
-        root[JSON.created.value   ] = render_date(self.created)
+        root[JSON.created.value] = render_date(self.created)
         root[JSON.dispatched.value] = render_date(self.dispatched)
-        root[JSON.on_scene.value  ] = render_date(self.on_scene)
-        root[JSON.closed.value    ] = render_date(self.closed)
+        root[JSON.on_scene.value] = render_date(self.on_scene)
+        root[JSON.closed.value] = render_date(self.closed)
 
-        root[JSON.ranger_handles.value] = [ranger.handle for ranger in self.rangers]
+        root[JSON.ranger_handles.value] = [
+            ranger.handle for ranger in self.rangers
+        ]
 
         root[JSON.report_entries.value] = [
             {
@@ -473,9 +526,9 @@ class ReportEntry(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
-                self.author       == other.author       and
-                self.text         == other.text         and
-                self.created      == other.created      and
+                self.author == other.author and
+                self.text == other.text and
+                self.created == other.created and
                 self.system_entry == other.system_entry
             )
         else:
@@ -485,17 +538,20 @@ class ReportEntry(object):
     def validate(self):
         if self.author is not None and type(self.author) is not unicode:
             raise InvalidDataError(
-                "Report entry author must be unicode, not {0!r}".format(self.author)
+                "Report entry author must be unicode, not {0!r}"
+                .format(self.author)
             )
 
         if type(self.text) is not unicode:
             raise InvalidDataError(
-                "Report entry text must be unicode, not {0!r}".format(self.text)
+                "Report entry text must be unicode, not {0!r}"
+                .format(self.text)
             )
 
         if type(self.created) is not DateTime:
             raise InvalidDataError(
-                "Report entry created date must be a DateTime, not {0!r}".format(self.created)
+                "Report entry created date must be a DateTime, not {0!r}"
+                .format(self.created)
             )
 
 
@@ -515,7 +571,10 @@ class Ranger(object):
 
 
     def __str__(self):
-        return u"{self.handle} ({self.name})".format(self=self).encode("utf-8")
+        return (
+            u"{self.handle} ({self.name})"
+            .format(self=self).encode("utf-8")
+        )
 
 
     def __repr__(self):
@@ -540,7 +599,7 @@ class Ranger(object):
         if isinstance(other, self.__class__):
             return (
                 self.handle == other.handle and
-                self.name   == other.name   and
+                self.name == other.name and
                 self.status == other.status
             )
         else:
@@ -573,7 +632,10 @@ class Location(object):
     def __str__(self):
         if self.name:
             if self.address:
-                return u"{self.name} ({self.address})".format(self=self).encode("utf-8")
+                return (
+                    u"{self.name} ({self.address})"
+                    .format(self=self).encode("utf-8")
+                )
             else:
                 return u"{self.name}".format(self=self).encode("utf-8")
         else:
@@ -602,7 +664,7 @@ class Location(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
-                self.name    == other.name    and
+                self.name == other.name and
                 self.address == other.address
             )
         else:
@@ -612,12 +674,14 @@ class Location(object):
     def validate(self):
         if self.name and type(self.name) is not unicode:
             raise InvalidDataError(
-                "Location name must be unicode, not {0!r}".format(self.name)
+                "Location name must be unicode, not {0!r}"
+                .format(self.name)
             )
 
         if self.address and type(self.address) is not unicode:
             raise InvalidDataError(
-                "Location address must be unicode, not {0!r}".format(self.address)
+                "Location address must be unicode, not {0!r}"
+                .format(self.address)
             )
 
 
@@ -634,9 +698,9 @@ class Shift(object):
         @param datetime: a L{DateTime} during the shift.
         """
         return cls(
-            position = position,
-            date = datetime.date(),
-            name = position.shiftForTime(datetime.time()),
+            position=position,
+            date=datetime.date(),
+            name=position.shiftForTime(datetime.time()),
         )
 
 
@@ -664,10 +728,18 @@ class Shift(object):
         if name is None:
             name = position.lookupByValue(time)
         elif name.value != time:
-            raise ValueError("time and name do not match: {0} != {1}".format(time, name))
+            raise ValueError(
+                "time and name do not match: {0} != {1}"
+                .format(time, name)
+            )
 
         self.position = position
-        self.start = DateTime(year=date.year, month=date.month, day=date.day, hour=time.hour)
+        self.start = DateTime(
+            year=date.year,
+            month=date.month,
+            day=date.day,
+            hour=time.hour,
+        )
         self.name = name
 
 
@@ -682,14 +754,35 @@ class Shift(object):
         )
 
 
-    def __lt__(self, other): return self.start <  other.start if isinstance(other, Shift) else NotImplemented
-    def __le__(self, other): return self.start <= other.start if isinstance(other, Shift) else NotImplemented
-    def __gt__(self, other): return self.start >  other.start if isinstance(other, Shift) else NotImplemented
-    def __ge__(self, other): return self.start >= other.start if isinstance(other, Shift) else NotImplemented
+    def __lt__(self, other):
+        if not isinstance(other, Shift):
+            return NotImplemented
+        return self.start < other.start
+
+
+    def __le__(self, other):
+        if not isinstance(other, Shift):
+            return NotImplemented
+        return self.start <= other.start
+
+
+    def __gt__(self, other):
+        if not isinstance(other, Shift):
+            return NotImplemented
+        return self.start > other.start
+
+
+    def __ge__(self, other):
+        if not isinstance(other, Shift):
+            return NotImplemented
+        return self.start >= other.start
 
 
     def __str__(self):
-        return u"{self.start:%y-%m-%d %a} {self.name.name}".format(self=self).encode("utf-8")
+        return (
+            u"{self.start:%y-%m-%d %a} {self.name.name}"
+            .format(self=self).encode("utf-8")
+        )
 
 
     @property
@@ -699,11 +792,11 @@ class Shift(object):
 
     def next_shift(self):
         return self.__class__(
-            position = self.position,
-            date = self.start.date(),
-            time = self.end,
+            position=self.position,
+            date=self.start.date(),
+            time=self.end,
         )
 
 
 def to_json_text(obj):
-    return dumps(obj, separators=(',',':'))
+    return dumps(obj, separators=(',', ':'))
