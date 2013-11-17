@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,14 +62,17 @@ class ShiftReportElement(BaseElement):
                 def add(datetime, activity):
                     if datetime is not None:
                         shift = Shift.from_datetime(DirtShift, datetime)
-                        incidents_by_activity = incidents_by_shift.setdefault(shift, {})
-                        incidents_by_activity.setdefault(activity, set()).add(incident)
-                    
+                        incidents_by_activity = incidents_by_shift.setdefault(
+                            shift, {}
+                        )
+                        incidents_by_activity.setdefault(
+                            activity, set()
+                        ).add(incident)
 
-                add(incident.created   , Activity.created)
+                add(incident.created, Activity.created)
                 add(incident.dispatched, Activity.updated)
-                add(incident.on_scene  , Activity.updated)
-                add(incident.closed    , Activity.closed)
+                add(incident.on_scene, Activity.updated)
+                add(incident.closed, Activity.closed)
 
                 for entry in incident.report_entries:
                     if not ignore_entry(entry):
@@ -79,12 +82,18 @@ class ShiftReportElement(BaseElement):
             for shift in sorted(incidents_by_shift):
                 incidents_by_activity = incidents_by_shift[shift]
 
-                created_incidents = incidents_by_activity.get(Activity.created, set())
+                created_incidents = incidents_by_activity.get(
+                    Activity.created, set()
+                )
 
                 open_incidents |= created_incidents
-                open_incidents -= incidents_by_activity.get(Activity.closed, set())
+                open_incidents -= incidents_by_activity.get(
+                    Activity.closed, set()
+                )
 
-                incidents_by_activity[Activity.idle] = open_incidents - created_incidents
+                incidents_by_activity[Activity.idle] = (
+                    open_incidents - created_incidents
+                )
 
             self._incidents_by_shift = incidents_by_shift
 
@@ -102,7 +111,9 @@ class ShiftReportElement(BaseElement):
             for activity in Activity.iterconstants():
                 output.append(u"  {0}".format(activity))
 
-                for incident in sorted(incidents_by_activity.get(activity, set())):
+                for incident in sorted(incidents_by_activity.get(
+                    activity, set()
+                )):
                     number = incident.number
                     summary = incident.summaryFromReport()
                     output.append(u"    {0}: {1}".format(number, summary))
@@ -119,12 +130,16 @@ class ShiftReportElement(BaseElement):
         shift_elements = []
         max = int(num_shifts_from_query(request))
         count = 0
+
         for shift in sorted(self.incidents_by_shift, reverse=True):
             if max:
                 count += 1
                 if count > max:
                     break
-            element = ShiftActivityElement(self.ims, shift, self.incidents_by_shift[shift])
+
+            element = ShiftActivityElement(
+                self.ims, shift, self.incidents_by_shift[shift]
+            )
             shift_elements.append(element)
 
         return tag(shift_elements)
@@ -135,13 +150,16 @@ class ShiftReportElement(BaseElement):
         if tag.attributes["value"] == num_shifts_from_query(request):
             return tag(selected="")
         else:
-            return tag;
+            return tag
 
 
 
 class ShiftActivityElement(BaseElement):
-    def __init__(self, ims, shift, incidents_by_activity, template_name="shift"):
+    def __init__(
+        self, ims, shift, incidents_by_activity, template_name="shift"
+    ):
         BaseElement.__init__(self, ims, template_name, str(shift))
+
         self.shift = shift
         self.incidents_by_activity = incidents_by_activity
 
@@ -155,15 +173,17 @@ class ShiftActivityElement(BaseElement):
     def activity(self, request, tag):
         created = self.incidents_by_activity.get(Activity.created, set())
         updated = self.incidents_by_activity.get(Activity.updated, set())
-        idle    = self.incidents_by_activity.get(Activity.idle   , set())
-        closed  = self.incidents_by_activity.get(Activity.closed , set())
+        idle = self.incidents_by_activity.get(Activity.idle, set())
+        closed  = self.incidents_by_activity.get(Activity.closed, set())
 
         def activity(caption, incidents):
             if incidents:
                 return incidents_as_table(
                     incidents,
                     caption=caption,
-                    id="activity:{0}:{1}".format(hash(self.shift), hash(caption)),
+                    id="activity:{0}:{1}".format(
+                        hash(self.shift), hash(caption)
+                    ),
                 )
             else:
                 return ""

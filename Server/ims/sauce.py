@@ -39,6 +39,7 @@ from ims.store import NoSuchIncidentError
 from ims.dms import DatabaseError
 
 
+
 def url_for(request, endpoint, *args, **kwargs):
     kwargs["force_external"] = True
     return IKleinRequest(request).url_for(endpoint, *args, **kwargs)

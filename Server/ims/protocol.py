@@ -55,6 +55,7 @@ class IncidentManagementSystem(object):
 
     protocol_version = "0.0"
 
+
     def __init__(self, config):
         self.config = config
         self.avatarId = None
@@ -105,6 +106,7 @@ class IncidentManagementSystem(object):
         )
 
         return d
+
 
     @app.route("/incident_types", methods=("GET",))
     @app.route("/incident_types/", methods=("GET",))
@@ -558,7 +560,7 @@ class IncidentManagementSystem(object):
     @http_sauce
     def jquery(self, request):
         version = "jquery-1.10.2.min.js"
-        url = "http://code.jquery.com/"+version
+        url = "http://code.jquery.com/" + version
         return self.cachedResource(version, url)
 
 
@@ -566,7 +568,7 @@ class IncidentManagementSystem(object):
     @http_sauce
     def jquery_map(self, request):
         name = "jquery-1.10.2.min.map"
-        url = "http://code.jquery.com/"+name
+        url = "http://code.jquery.com/" + name
         return self.cachedResource(name, url)
 
 

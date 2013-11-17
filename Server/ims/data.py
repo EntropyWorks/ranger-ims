@@ -60,6 +60,7 @@ class JSON(Values):
     name             = ValueConstant("name")
     url              = ValueConstant("url")
 
+
     @classmethod
     def states(cls):
         if not hasattr(cls, "_states"):
@@ -71,6 +72,7 @@ class JSON(Values):
             )
         return cls._states
 
+
     @classmethod
     def cmpStates(cls, a, b):
         assert isinstance(a, ValueConstant), "a"
@@ -80,6 +82,7 @@ class JSON(Values):
             states = cls.states()
             cls._stateIndexes = dict(zip(states, xrange(0, len(states))))
         return cmp(cls._stateIndexes[a], cls._stateIndexes[b])
+
 
     @classmethod
     def describe(cls, value):

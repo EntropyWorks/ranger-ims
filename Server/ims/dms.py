@@ -41,10 +41,11 @@ from ims.data import Ranger
 class DirtShift(Values):
     length = 6
 
-    Grave     = ValueConstant(Time(hour=length*0))
-    Morning   = ValueConstant(Time(hour=length*1))
-    Afternoon = ValueConstant(Time(hour=length*2))
-    Swing     = ValueConstant(Time(hour=length*3))
+    Grave     = ValueConstant(Time(hour=length * 0))
+    Morning   = ValueConstant(Time(hour=length * 1))
+    Afternoon = ValueConstant(Time(hour=length * 2))
+    Swing     = ValueConstant(Time(hour=length * 3))
+
 
     @classmethod
     def shiftForTime(cls, time):
@@ -82,6 +83,7 @@ class DutyManagementSystem(object):
     Duty Management System
     """
     rangers_cache_interval = 60 * 60 * 1  # 1 hour
+
 
     def __init__(self, host, database, username, password):
         self.host     = host

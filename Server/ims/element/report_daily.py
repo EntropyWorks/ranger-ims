@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,8 +38,12 @@ class DailyReportElement(BaseElement):
         BaseElement.__init__(self, ims, template_name, "Daily Report")
 
 
-    def _index_incidents(self, start_hour=19): # 19 == 12 adjusted for timezone from UTC
-        if not hasattr(self, "_incidents_by_date") or not hasattr(self, "_incidents_by_type"):
+    def _index_incidents(self, start_hour=19):
+        # 19 == 12 adjusted for timezone from UTC
+        if (
+            not hasattr(self, "_incidents_by_date") or
+            not hasattr(self, "_incidents_by_type")
+        ):
             storage = self.ims.storage
             incidents_by_date = {}
             incidents_by_type = {}
@@ -78,7 +82,10 @@ class DailyReportElement(BaseElement):
 
                 if incident.incident_types:
                     for incident_type in incident.incident_types:
-                        incidents_by_type.setdefault(incident_type, set()).add(incident)
+                        incidents_by_type.setdefault(
+                            incident_type,
+                            set()
+                        ).add(incident)
                 else:
                     incidents_by_type.setdefault(None, set()).add(incident)
 
@@ -136,7 +143,9 @@ class DailyReportElement(BaseElement):
         incidents_by_date = self.incidents_by_date()
 
         for incident_type in sorted(incidents_by_type):
-            if incident_type in set((IncidentType.Admin.value, "Echelon", "SITE")):
+            if incident_type in set((
+                IncidentType.Admin.value, "Echelon", "SITE"
+            )):
                 continue
 
             if labels:
@@ -150,10 +159,15 @@ class DailyReportElement(BaseElement):
             seen = set()
 
             for date in sorted(incidents_by_date):
-                incidents = incidents_by_type[incident_type] & incidents_by_date[date]
+                incidents = (
+                    incidents_by_type[incident_type] & incidents_by_date[date]
+                )
                 seen |= incidents
                 row.append("{0}".format(len(incidents)))
-                #row.append("{0} ({1})".format(len(incidents), ",".join((str(i.number) for i in incidents))))
+                # row.append("{0} ({1})".format(
+                #     len(incidents),
+                #     ",".join((str(i.number) for i in incidents))
+                # ))
 
             if totals:
                 row.append(len(incidents_by_type[incident_type]))
@@ -161,7 +175,10 @@ class DailyReportElement(BaseElement):
             unseen = incidents_by_type[incident_type] - seen
 
             if unseen:
-                log.msg("ERROR: No date for some {0} incidents (!?): {1}".format(incident_type, unseen))
+                log.msg(
+                    "ERROR: No date for some {0} incidents (!?): {1}"
+                    .format(incident_type, unseen)
+                )
 
             rows.append(row)
 

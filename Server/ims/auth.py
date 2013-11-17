@@ -19,6 +19,7 @@ Authentication
 """
 
 __all__ = [
+    "guard",
 ]
 
 from zope.interface import implements

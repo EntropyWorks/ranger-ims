@@ -1,12 +1,12 @@
 ##
 # See the file COPYRIGHT for copyright information.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,9 +59,9 @@ def incidents_from_query(ims, request):
     if not hasattr(request, "ims_incidents"):
         if request.args:
             request.ims_incidents = ims.storage.search_incidents(
-                terms = terms_from_query(request),
-                show_closed = show_closed_from_query(request),
-                since = since_from_query(request),
+                terms=terms_from_query(request),
+                show_closed=show_closed_from_query(request),
+                since=since_from_query(request),
             )
         else:
             request.ims_incidents = ims.storage.list_incidents()
@@ -119,7 +119,11 @@ def query_value(request, key, default, no_args_default=None):
     if not hasattr(request, attr_name):
         if request.args:
             try:
-                setattr(request, attr_name, request.args.get(key, [default])[-1])
+                setattr(
+                    request,
+                    attr_name,
+                    request.args.get(key, [default])[-1]
+                )
             except IndexError:
                 setattr(request, attr_name, default)
         else:
@@ -141,21 +145,21 @@ def incidents_as_table(incidents, caption=None, id=None):
 
     def incidents_as_rows(incidents):
         attrs_incident = {"class": "incident"}
-        attrs_number   = {"class": "incident_number"  }
+        attrs_number = {"class": "incident_number"}
         attrs_priority = {"class": "incident_priority"}
-        attrs_rangers  = {"class": "incident_rangers" }
+        attrs_rangers = {"class": "incident_rangers"}
         attrs_location = {"class": "incident_location"}
-        attrs_types    = {"class": "incident_types"   }
-        attrs_summary  = {"class": "incident_summary" }
-        
+        attrs_types = {"class": "incident_types"}
+        attrs_summary  = {"class": "incident_summary"}
+
         yield tags.thead(
             tags.tr(
-                tags.th(u"#"       , **attrs_number  ),
+                tags.th(u"#", **attrs_number),
                 tags.th(u"Priority", **attrs_priority),
-                tags.th(u"Rangers" , **attrs_rangers ),
+                tags.th(u"Rangers", **attrs_rangers),
                 tags.th(u"Location", **attrs_location),
-                tags.th(u"Types"   , **attrs_types   ),
-                tags.th(u"Summary" , **attrs_summary ),
+                tags.th(u"Types", **attrs_types),
+                tags.th(u"Summary", **attrs_summary),
                 **attrs_incident
             ),
             **attrs_activity
@@ -163,13 +167,28 @@ def incidents_as_table(incidents, caption=None, id=None):
 
         yield tags.tbody(
             tags.tr(
-                tags.td(u"{0}".format(incident.number), **attrs_number), 
-                tags.td(u"{0}".format(incident.priority), **attrs_priority),  
-                tags.td(u"{0}".format(", ".join(ranger.handle for ranger in incident.rangers)), **attrs_rangers),
-                tags.td(u"{0}".format(str(incident.location).decode("utf-8")), **attrs_location),
-                tags.td(u"{0}".format(", ".join(incident.incident_types)), **attrs_types),
-                tags.td(u"{0}".format(incident.summaryFromReport()), **attrs_summary),
-                onclick="""window.open("/queue/incidents/{0}");""".format(incident.number),
+                tags.td(
+                    u"{0}".format(incident.number), **attrs_number
+                ),
+                tags.td(
+                    u"{0}".format(incident.priority), **attrs_priority
+                ),
+                tags.td(u"{0}".format(
+                    u", ".join(ranger.handle for ranger in incident.rangers)
+                ), **attrs_rangers),
+                tags.td(u"{0}".format(
+                    str(incident.location).decode("utf-8")
+                ), **attrs_location),
+                tags.td(u"{0}".format(
+                    u", ".join(incident.incident_types)
+                ), **attrs_types),
+                tags.td(u"{0}".format(
+                    incident.summaryFromReport()
+                ), **attrs_summary),
+                onclick=(
+                    'window.open("/queue/incidents/{0}");'
+                    .format(incident.number)
+                ),
                 **attrs_incident
             )
             for incident in sorted(incidents)

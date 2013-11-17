@@ -35,6 +35,7 @@ from ims.auth import guard
 from ims.protocol import IncidentManagementSystem
 
 
+
 def loadConfig():
     configFile = (
         FilePath(__file__).parent().parent().child("conf").child("imsd.conf")
