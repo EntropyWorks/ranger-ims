@@ -1,0 +1,11 @@
+# Twisted
+zope.interface==4.0.5
+Twisted==13.0.0
+pyOpenSSL==0.13
+
+# Klein
+Werkzeug==0.8.3  # Dont use 0.9.3; see https://github.com/twisted/klein/issues/19
+klein==0.2.0
+
+# MySQL
+--allow-external mysql-connector-python==1.0.10

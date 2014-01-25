@@ -4,8 +4,10 @@
 .#*
 _trial_temp/
 *.egg-info/
-MANIFEST
-build/
-data/
-dist/
-log/
+/.develop/
+/MANIFEST
+/build/
+/data/
+/dist/
+/ims/version.py
+/log/
