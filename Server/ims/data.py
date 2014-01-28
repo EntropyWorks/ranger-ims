@@ -699,6 +699,8 @@ class Shift(object):
             position the shift is for.
 
         @param datetime: a L{DateTime} during the shift.
+
+
         """
         return cls(
             position=position,
