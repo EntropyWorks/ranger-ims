@@ -21,12 +21,12 @@ set -u
 
 wd="$(cd "$(dirname "$0")/.." && pwd)";
 
-export TWEXT_DEVELOP="true";
+export IMS_DEVELOP="true";
 
 . "${wd}/bin/_build.sh";
 
 init_build > /dev/null;
-c_dependencies >> "${dev_root}/setup.log";
-py_dependencies >> "${dev_root}/setup.log";
+c_dependencies >> "${dev_home}/setup.log";
+py_dependencies >> "${dev_home}/setup.log";
 
 exec "${python}" "$@";
