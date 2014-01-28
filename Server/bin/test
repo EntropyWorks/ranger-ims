@@ -98,7 +98,7 @@ find "${wd}" -name \*.pyc -print0 | xargs -0 rm;
 # Unit tests
 ##
 
-cd "${wd}" && "${wd}/bin/trial"    \
+cd "${wd}" && "${py_bindir}/trial" \
   --temp-directory="${wd}/.trial"  \
   --rterrors                       \
   ${reactor}                       \
