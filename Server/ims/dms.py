@@ -83,7 +83,7 @@ class DutyManagementSystem(object):
 
     This class coonects to an external system to get data.
     """
-    rangers_cache_interval = 60 * 60 * 1  # 1 hour
+    personnel_cache_interval = 60 * 60 * 1  # 1 hour
 
 
     def __init__(self, host, database, username, password):
@@ -105,7 +105,7 @@ class DutyManagementSystem(object):
         self.username = username
         self.password = password
 
-        self._rangers_updated = 0
+        self._personnel_updated = 0
 
 
     @property
@@ -122,20 +122,20 @@ class DutyManagementSystem(object):
 
 
     @inlineCallbacks
-    def rangers(self):
+    def personnel(self):
         now = time()
 
-        if now - self.rangers_updated > self.rangers_cache_interval:
+        if now - self._personnel_updated > self.personnel_cache_interval:
             # Mark as updated now so we don't end up performing multiple
             # (redundant) DB queries at the same time.
-            self.rangers_updated = now
+            self._personnel_updated = now
 
             try:
                 #
-                # Ask the Ranger database for a list of Rangers.
+                # Ask the database for a list of personnel.
                 #
                 log.msg(
-                    "{0} Retrieving Rangers from Duty Management System..."
+                    "{0} Retrieving personnel from Duty Management System..."
                     .format(self)
                 )
 
@@ -149,19 +149,19 @@ class DutyManagementSystem(object):
                     )
                 """)
 
-                self._rangers = tuple(
+                self._personnel = tuple(
                     Ranger(handle, fullName(first, middle, last), status)
                     for handle, first, middle, last, status
                     in results
                 )
-                self.rangers_updated = time()
+                self._personnel_updated = time()
 
             except Exception as e:
-                self.rangers_updated = 0
+                self._personnel_updated = 0
                 self._dbpool = None
                 raise DatabaseError(e)
 
-        returnValue(self._rangers)
+        returnValue(self._personnel)
 
 
 def fullName(first, middle, last):

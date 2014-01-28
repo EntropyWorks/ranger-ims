@@ -20,6 +20,9 @@ Tests for L{ims.dms}.
 
 from twisted.trial import unittest
 
+from twisted.internet.defer import succeed, fail
+from twisted.internet.defer import inlineCallbacks
+
 import ims.dms
 from ims.dms import DutyManagementSystem
 
@@ -33,6 +36,23 @@ class DummyConnectionPool(object):
 
     def runQuery(self, *args, **kw):
         self.lastQuery = dict(args=args, kwargs=kw)
+
+        query = args[0]
+
+        # Collapse spaces
+        query = " ".join(query.split())
+
+        if query == (
+            "select callsign, first_name, mi, last_name, status "
+            "from person "
+            "where status not in "
+            "( 'prospective', 'alpha', 'bonked', 'uberbonked', 'deceased' )"
+        ):
+            return succeed(iter(cannedPersonnel))
+
+        return fail(
+            AssertionError("No canned response for query: {0}".format(query))
+        )
 
 
 
@@ -73,7 +93,7 @@ class DutyManagementSystemTests(unittest.TestCase):
         self.assertEquals(dms.database, self.database)
         self.assertEquals(dms.username, self.username)
         self.assertEquals(dms.password, self.password)
-        self.assertEquals(dms._rangers_updated, 0)
+        self.assertEquals(dms._personnel_updated, 0)
 
 
     def test_dbpool(self):
@@ -87,3 +107,26 @@ class DutyManagementSystemTests(unittest.TestCase):
         self.assertEquals(dbpool.connkw["database"], self.database)
         self.assertEquals(dbpool.connkw["user"], self.username)
         self.assertEquals(dbpool.connkw["password"], self.password)
+
+
+    @inlineCallbacks
+    def test_personnel(self):
+        dms = self.dms()
+
+        personnel = yield dms.personnel()
+
+        self.assertEquals(
+            [p.handle for p in personnel],
+            [p[0] for p in cannedPersonnel],
+        )
+
+
+
+cannedPersonnel = (
+    ("Easy E", "Eric", "P", "Grant", "active"),
+    ("El Weso", "Wes", "", "Johnson", "active"),
+    ("SciFi", "Fred", "", "McCord", "active"),
+    ("Slumber", "Sleepy", "T", "Drarf", "inactive"),
+    ("Tool", "Wilfredo", "", "Sanchez", "vintage"),
+    ("Tulsa", "Curtis", "", "Kline", "vintage"),
+)
