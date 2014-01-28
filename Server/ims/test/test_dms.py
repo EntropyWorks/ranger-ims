@@ -28,21 +28,36 @@ from ims.dms import DutyManagementSystem
 
 
 
+class DummyQuery(object):
+    def __init__(self, args, kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+
+    def sql(self):
+        sql = self.args[0]
+
+        # Collapse spaces
+        sql = " ".join(sql.split())
+
+        return sql
+
+
 class DummyConnectionPool(object):
     def __init__(self, dbapiname, **connkw):
         self.dbapiname = dbapiname
         self.connkw = connkw
+        self.queries = []
 
 
     def runQuery(self, *args, **kw):
-        self.lastQuery = dict(args=args, kwargs=kw)
+        query = DummyQuery(args, kw)
 
-        query = args[0]
+        self.queries.append(query)
 
-        # Collapse spaces
-        query = " ".join(query.split())
+        sql = query.sql()
 
-        if query == (
+        if sql == (
             "select callsign, first_name, mi, last_name, status "
             "from person "
             "where status not in "
@@ -51,7 +66,7 @@ class DummyConnectionPool(object):
             return succeed(iter(cannedPersonnel))
 
         return fail(
-            AssertionError("No canned response for query: {0}".format(query))
+            AssertionError("No canned response for query: {0}".format(sql))
         )
 
 
