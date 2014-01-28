@@ -21,7 +21,7 @@ Tests for L{ims.data}.
 from cStringIO import StringIO
 from datetime import datetime
 
-import twisted.trial.unittest
+from twisted.trial import unittest
 
 from ims.data import (
     InvalidDataError,
@@ -34,7 +34,7 @@ from ims.data import (
 
 
 
-class IncidentTests(twisted.trial.unittest.TestCase):
+class IncidentTests(unittest.TestCase):
     """
     Tests for L{ims.data.Incident}
     """
@@ -344,7 +344,7 @@ class IncidentTests(twisted.trial.unittest.TestCase):
 
 
 
-class ReportEntryTests(twisted.trial.unittest.TestCase):
+class ReportEntryTests(unittest.TestCase):
     """
     Tests for L{ims.data.ReportEntry}
     """
@@ -356,7 +356,7 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry = ReportEntry(
             author=u"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
         self.assertEquals(
             str(entry),
@@ -371,7 +371,7 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry = ReportEntry(
             author=u"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
         self.assertEquals(
             repr(entry),
@@ -390,12 +390,12 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry1 = ReportEntry(
             author=u"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
         entry2 = ReportEntry(
             author=u"Tool",
             text=u"Something else happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
 
         self.assertNotEquals(entry1, entry2)
@@ -408,12 +408,12 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry1a = ReportEntry(
             author=u"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
         entry1b = ReportEntry(
             author=u"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
 
         self.assertEquals(entry1a, entry1a)
@@ -427,7 +427,7 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry = ReportEntry(
             author=u"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
 
         self.assertNotEquals(entry, object())
@@ -440,7 +440,7 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry = ReportEntry(
             author=u"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
 
         entry.validate()
@@ -454,7 +454,7 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry = ReportEntry(
             author=b"Tool",
             text=u"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
 
         self.assertRaises(InvalidDataError, entry.validate)
@@ -468,7 +468,7 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
         entry = ReportEntry(
             author=u"Tool",
             text=b"Something happened!",
-            created=datetime(1972, 06, 29, 12,  0, 0),
+            created=datetime(1972, 06, 29, 12, 0, 0),
         )
 
         self.assertRaises(InvalidDataError, entry.validate)
@@ -489,7 +489,7 @@ class ReportEntryTests(twisted.trial.unittest.TestCase):
 
 
 
-class RangerTests(twisted.trial.unittest.TestCase):
+class RangerTests(unittest.TestCase):
     """
     Tests for L{ims.data.Ranger}
     """
@@ -593,7 +593,7 @@ class RangerTests(twisted.trial.unittest.TestCase):
 
 
 
-class LocationTests(twisted.trial.unittest.TestCase):
+class LocationTests(unittest.TestCase):
     """
     Tests for L{ims.data.Location}
     """
