@@ -34,11 +34,17 @@ class DutyManagementSystemTests(unittest.TestCase):
     """
 
     def setUp(self):
+        """
+        Patch adbapi module.
+        """
         self.dummyADBAPI = DummyADBAPI()
         self.patch(ims.dms, "adbapi", self.dummyADBAPI)
 
 
     def dms(self):
+        """
+        Gimme a DMS.
+        """
         self.host = u"the-server"
         self.database = u"the-db"
         self.username = u"the-user"
@@ -53,6 +59,9 @@ class DutyManagementSystemTests(unittest.TestCase):
 
 
     def test_init(self):
+        """
+        Initialized state is as expected.
+        """
         dms = self.dms()
 
         self.assertEquals(dms.host, self.host)
@@ -63,6 +72,9 @@ class DutyManagementSystemTests(unittest.TestCase):
 
 
     def test_dbpool(self):
+        """
+        L{DutyManagementSystem.dbpool} returns a DB pool.
+        """
         dms = self.dms()
         dbpool = dms.dbpool
 
@@ -77,6 +89,9 @@ class DutyManagementSystemTests(unittest.TestCase):
 
     @inlineCallbacks
     def test_personnel(self):
+        """
+        L{DutyManagementSystem.personnel} returns L{Ranger} objects.
+        """
         dms = self.dms()
 
         personnel = yield dms.personnel()
@@ -94,18 +109,28 @@ class UtilTests(unittest.TestCase):
     """
 
     def test_fullName(self):
+        """
+        L{fullName} combines first/middle/last correctly.
+        """
         self.assertEquals(fullName("Bob", "", "Smith"), "Bob Smith")
         self.assertEquals(fullName("Bob", "Q", "Smith"), "Bob Q. Smith")
 
 
 
 class DummyQuery(object):
+    """
+    Represents a call to C{runQuery}.
+    """
+
     def __init__(self, args, kwargs):
         self.args = args
         self.kwargs = kwargs
 
 
     def sql(self):
+        """
+        Produce normalized SQL for the query.
+        """
         sql = self.args[0]
 
         # Collapse spaces
@@ -114,7 +139,12 @@ class DummyQuery(object):
         return sql
 
 
+
 class DummyConnectionPool(object):
+    """
+    Mock for L{adbapi.ConnectionPool}.
+    """
+
     def __init__(self, dbapiname, **connkw):
         self.dbapiname = dbapiname
         self.connkw = connkw
@@ -143,6 +173,10 @@ class DummyConnectionPool(object):
 
 
 class DummyADBAPI(object):
+    """
+    Mock for L{adbapi}.
+    """
+
     def __init__(self):
         self.ConnectionPool = DummyConnectionPool
 
