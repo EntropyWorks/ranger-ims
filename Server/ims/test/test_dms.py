@@ -24,56 +24,7 @@ from twisted.internet.defer import succeed, fail
 from twisted.internet.defer import inlineCallbacks
 
 import ims.dms
-from ims.dms import DutyManagementSystem
-
-
-
-class DummyQuery(object):
-    def __init__(self, args, kwargs):
-        self.args = args
-        self.kwargs = kwargs
-
-
-    def sql(self):
-        sql = self.args[0]
-
-        # Collapse spaces
-        sql = " ".join(sql.split())
-
-        return sql
-
-
-class DummyConnectionPool(object):
-    def __init__(self, dbapiname, **connkw):
-        self.dbapiname = dbapiname
-        self.connkw = connkw
-        self.queries = []
-
-
-    def runQuery(self, *args, **kw):
-        query = DummyQuery(args, kw)
-
-        self.queries.append(query)
-
-        sql = query.sql()
-
-        if sql == (
-            "select callsign, first_name, mi, last_name, status "
-            "from person "
-            "where status not in "
-            "( 'prospective', 'alpha', 'bonked', 'uberbonked', 'deceased' )"
-        ):
-            return succeed(iter(cannedPersonnel))
-
-        return fail(
-            AssertionError("No canned response for query: {0}".format(sql))
-        )
-
-
-
-class DummyADBAPI(object):
-    def __init__(self):
-        self.ConnectionPool = DummyConnectionPool
+from ims.dms import DutyManagementSystem, fullName
 
 
 
@@ -134,6 +85,66 @@ class DutyManagementSystemTests(unittest.TestCase):
             [p.handle for p in personnel],
             [p[0] for p in cannedPersonnel],
         )
+
+
+
+class UtilTests(unittest.TestCase):
+    """
+    Tests for L{ims.dms}
+    """
+
+    def test_fullName(self):
+        self.assertEquals(fullName("Bob", "", "Smith"), "Bob Smith")
+        self.assertEquals(fullName("Bob", "Q", "Smith"), "Bob Q. Smith")
+
+
+
+class DummyQuery(object):
+    def __init__(self, args, kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+
+    def sql(self):
+        sql = self.args[0]
+
+        # Collapse spaces
+        sql = " ".join(sql.split())
+
+        return sql
+
+
+class DummyConnectionPool(object):
+    def __init__(self, dbapiname, **connkw):
+        self.dbapiname = dbapiname
+        self.connkw = connkw
+        self.queries = []
+
+
+    def runQuery(self, *args, **kw):
+        query = DummyQuery(args, kw)
+
+        self.queries.append(query)
+
+        sql = query.sql()
+
+        if sql == (
+            "select callsign, first_name, mi, last_name, status "
+            "from person "
+            "where status not in "
+            "( 'prospective', 'alpha', 'bonked', 'uberbonked', 'deceased' )"
+        ):
+            return succeed(iter(cannedPersonnel))
+
+        return fail(
+            AssertionError("No canned response for query: {0}".format(sql))
+        )
+
+
+
+class DummyADBAPI(object):
+    def __init__(self):
+        self.ConnectionPool = DummyConnectionPool
 
 
 
