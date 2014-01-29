@@ -2,12 +2,9 @@
 *.pyo
 #*#
 .#*
-_trial_temp/
-*.egg-info/
+/.trial/
 /.develop/
 /MANIFEST
-/build/
 /data/
-/dist/
 /ims/version.py
 /log/
