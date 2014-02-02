@@ -478,6 +478,7 @@ ruler () {
 # Build C dependencies
 #
 c_dependencies () {
+  :;
 }
 
 
