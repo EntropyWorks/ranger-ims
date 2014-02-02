@@ -99,6 +99,12 @@ init_build () {
   py_libdir="${py_root}/lib/python";
   py_bindir="${py_root}/bin";
 
+  if [ -z "${TWEXT_PKG_CACHE-}" ]; then
+    dep_packages="${dev_home}/pkg";
+  else
+    dep_packages="${TWEXT_PKG_CACHE}";
+  fi;
+
   mkdir -p "${dep_sources}";
 
   if "${force_setup}"; then
@@ -110,6 +116,10 @@ init_build () {
   "${bootstrap_python}" -m virtualenv "${py_root}";
 
   python="${py_bindir}/python";
+
+  # Make sure setup got called enough to write the version file.
+
+  "${python}" "${wd}/setup.py" check > /dev/null;
 
   # These variables are defaults for things which might be configured by
   # environment; only set them if they're un-set.
@@ -468,53 +478,6 @@ ruler () {
 # Build C dependencies
 #
 c_dependencies () {
-     c_glue_root="${dev_roots}/c_glue";
-  c_glue_include="${c_glue_root}/include";
-
-  export C_INCLUDE_PATH="${c_glue_include}:${C_INCLUDE_PATH:-}";
-
-  ruler;
-  if find_header ffi.h; then
-    using_system "libffi";
-  elif find_header ffi/ffi.h; then
-    mkdir -p "${c_glue_include}";
-    echo "#include <ffi/ffi.h>" > "${c_glue_include}/ffi.h"
-    using_system "libffi";
-  else
-    c_dependency -m "45f3b6dbc9ee7c7dfbbbc5feba571529" \
-      "libffi" "libffi-3.0.13" \
-      "ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
-  fi;
-
-  ruler;
-  if find_header ldap.h 20428 LDAP_VENDOR_VERSION; then
-    using_system "OpenLDAP";
-  else
-    local v="2.4.38";
-    local n="openldap";
-    local p="${n}-${v}";
-    c_dependency -m "39831848c731bcaef235a04e0d14412f" \
-      "OpenLDAP" "${p}" \
-      "http://www.openldap.org/software/download/OpenLDAP/${n}-release/${p}.tgz" \
-      --disable-bdb --disable-hdb;
-  fi;
-
-  ruler;
-  if find_header sasl.h; then
-    using_system "SASL";
-  elif find_header sasl/sasl.h; then
-    mkdir -p "${c_glue_include}";
-    echo "#include <sasl/sasl.h>" > "${c_glue_include}/sasl.h"
-    using_system "SASL";
-  else
-    local v="2.1.26";
-    local n="cyrus-sasl";
-    local p="${n}-${v}";
-    c_dependency -m "a7f4e5e559a0e37b3ffc438c9456e425" \
-      "Cyrus SASL" "${p}" \
-      "ftp://ftp.cyrusimap.org/cyrus-sasl/${p}.tar.gz" \
-      --disable-macos-framework;
-  fi;
 }
 
 
@@ -524,26 +487,26 @@ c_dependencies () {
 py_dependencies () {
   export PATH="${py_root}/bin:${PATH}";
 
+  if ! "${do_setup}"; then return 0; fi;
+
   for requirements in "${wd}/requirements/py_"*".txt"; do
 
     ruler "Preparing Python requirements: ${requirements}";
     echo "";
 
-    if "${do_setup}"; then
-      if ! "${python}" -m pip install               \
-          --requirement "${requirements}"           \
-          --download-cache "${dev_home}/pip_cache"  \
-          --log "${dev_home}/pip.log"               \
-      ; then
-        err=$?;
-        echo "Unable to set up Python requirements: ${requirements}";
-        if [ "${requirements#${wd}/requirements/py_opt_}" != "${requirements}" ]; then
-          echo "Requirements ${requirements} are optional; continuing.";
-        else
-          echo "";
-          echo "pip log: ${dev_home}/pip.log";
-          return 1;
-        fi;
+    if ! "${python}" -m pip install               \
+        --requirement "${requirements}"           \
+        --download-cache "${dev_home}/pip_cache"  \
+        --log "${dev_home}/pip.log"               \
+    ; then
+      err=$?;
+      echo "Unable to set up Python requirements: ${requirements}";
+      if [ "${requirements#${wd}/requirements/py_opt_}" != "${requirements}" ]; then
+        echo "Requirements ${requirements} are optional; continuing.";
+      else
+        echo "";
+        echo "pip log: ${dev_home}/pip.log";
+        return 1;
       fi;
     fi;
 

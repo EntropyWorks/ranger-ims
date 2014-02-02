@@ -21,7 +21,9 @@ set -u
 
 wd="$(cd "$(dirname "$0")/.." && pwd)";
 
-export IMS_DEVELOP="true";
+export _DEVELOP="true";
+
+export PYTHONPATH="${wd}:${PYTHONPATH:-}";
 
 . "${wd}/bin/_build.sh";
 

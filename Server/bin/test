@@ -19,29 +19,33 @@
 set -e;
 set -u;
 
+#
+# Initialize build support
+#
+
 wd="$(cd "$(dirname "$0")/.." && pwd -L)";
 
-export IMS_DEVELOP="true";
+export _DEVELOP="true";
 
 . "${wd}/bin/_build.sh";
 
 init_build > /dev/null;
-c_dependencies >> "${dev_home}/setup.log";
-py_dependencies >> "${dev_home}/setup.log";
 
-##
+
+
+#
 # Options
-##
+#
 
 do_setup="false";
-do_get="false";
+  do_get="false";
 
-random="--random=$(date "+%s")";
-no_color="";
+    random="--random=$(date "+%s")";
+  no_color="";
 until_fail="";
-coverage="";
-numjobs="";
-reactor="";
+  coverage="";
+   numjobs="";
+   reactor="";
 
 if [ "$(uname -s)" == "Darwin" ]; then
   reactor="--reactor=kqueue";
@@ -87,26 +91,38 @@ else
   lint="false";
 fi;
 
-##
+
+
+#
+# Dependencies
+#
+
+c_dependencies >> "${dev_home}/setup.log";
+py_dependencies >> "${dev_home}/setup.log";
+
+
+
+#
 # Clean up
-##
+#
 
 find "${wd}" -name \*.pyc -print0 | xargs -0 rm;
 
 
-##
-# Unit tests
-##
 
-cd "${wd}" && "${py_bindir}/trial" \
-  --temp-directory="${wd}/.trial"  \
-  --rterrors                       \
-  ${reactor}                       \
-  ${random}                        \
-  ${until_fail}                    \
-  ${no_color}                      \
-  ${coverage}                      \
-  ${numjobs}                       \
+#
+# Unit tests
+#
+
+cd "${wd}" && "${wd}/bin/trial"         \
+  --temp-directory="${dev_home}/trial"  \
+  --rterrors                            \
+  ${reactor}                            \
+  ${random}                             \
+  ${until_fail}                         \
+  ${no_color}                           \
+  ${coverage}                           \
+  ${numjobs}                            \
   "$@";
 
 
@@ -114,9 +130,11 @@ if ! "${lint}"; then
   exit 0;
 fi;
 
-##
+
+
+#
 # Linting
-##
+#
 
 echo "";
 echo "Running pyflakes...";
@@ -131,9 +149,10 @@ fi;
 rm -f "${tmp}";
 
 
-##
+
+#
 # Empty files
-##
+#
 
 echo "";
 echo "Checking for empty files...";
