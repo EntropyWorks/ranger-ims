@@ -24,6 +24,7 @@ from datetime import datetime
 from twisted.trial import unittest
 
 from ims.data import (
+    JSON,
     InvalidDataError,
     Incident,
     ReportEntry,
@@ -31,6 +32,33 @@ from ims.data import (
     Location,
     from_json_text,
 )
+
+
+
+class ConstantTests(unittest.TestCase):
+    """
+    Tests for constants in L{ims.data}.
+    """
+
+    def test_JSON_states(self):
+        """
+        L{JSON.states} returns incident state names.
+        """
+        self.assertEquals(
+            set(JSON.states()),
+            set((
+                JSON.created,
+                JSON.dispatched,
+                JSON.on_scene,
+                JSON.closed,
+            )),
+        )
+
+
+    def test_JSON_cmpStates(self):
+        states = tuple(JSON.states())
+
+        self.assertEquals(states, sorted(states))
 
 
 
