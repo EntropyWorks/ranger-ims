@@ -26,13 +26,13 @@ __all__ = [
     "ReportEntry",
     "Ranger",
     "Location",
-    "Shift",
+    # "Shift",
     "to_json_text",
     "from_json_io",
     "from_json_text",
 ]
 
-from datetime import datetime as DateTime, timedelta as TimeDelta
+from datetime import datetime as DateTime  # , timedelta as TimeDelta
 from json import dumps, load as from_json_io, loads as from_json_text
 
 from twisted.python.constants import Values, ValueConstant
@@ -63,6 +63,12 @@ class JSON(Values):
 
     @classmethod
     def states(cls):
+        """
+        List the constants that are states names.
+
+        @return: All incident state names.
+        @rtype: iterable of L{ValueConstant}
+        """
         if not hasattr(cls, "_states"):
             cls._states = (
                 cls.created,
@@ -75,6 +81,19 @@ class JSON(Values):
 
     @classmethod
     def cmpStates(cls, a, b):
+        """
+        Compare two states for ordering purposes.
+
+        @param a: A JSON state name.
+        @type a: L{ValueConstant}
+
+        @param b: A JSON state name.
+        @type b: L{ValueConstant}
+
+        @return: An number that is negative if C{a < b}, zero if C{a == b}, and
+            positive if C{a > b}.
+        @rtype: L{int}
+        """
         assert isinstance(a, ValueConstant), "a"
         assert isinstance(b, ValueConstant), "b"
 
@@ -86,6 +105,15 @@ class JSON(Values):
 
     @classmethod
     def describe(cls, value):
+        """
+        Describe a constant as a human-readable string.
+
+        @param value: A JSON constant.
+        @type constant: L{ValueConstant}
+
+        @return: A string description of C{value}.
+        @rtype: L{unicode}
+        """
         return {
             cls.created: u"new",
         }.get(value, value.name.replace("_", " ").decode("utf-8"))
@@ -116,18 +144,64 @@ class Incident(object):
 
     @classmethod
     def from_json_text(cls, text, number=None, validate=True):
+        """
+        Create an incident from JSON text.
+
+        @param text: JSON text describing an incident.
+        @type text: L{unicode}
+
+        @param number: The number of the incident.
+            If C{number} is not C{None} and C{text} includes an incident number
+            that is different than C{number}, raise an L{InvalidDataError}.
+        @type number: L{int}
+
+        @param validate: If true, raise L{InvalidDataError} is the data does
+            not validate as a fully-well-formed incident.
+        @type validate: L{bool}
+        """
         root = from_json_text(text)
         return cls.from_json(root, number, validate)
 
 
     @classmethod
     def from_json_io(cls, io, number=None, validate=True):
+        """
+        Create an incident from a file.
+
+        @param io: An open file containing JSON text.
+        @type io: A file-like object with a C{read} method that returns UTF-8
+            L{bytes}.
+
+        @param number: The number of the incident.
+            If C{number} is not C{None} and C{text} includes an incident number
+            that is different than C{number}, raise an L{InvalidDataError}.
+        @type number: L{int}
+
+        @param validate: If true, raise L{InvalidDataError} is the data does
+            not validate as a fully-well-formed incident.
+        @type validate: L{bool}
+        """
         root = from_json_io(io)
         return cls.from_json(root, number, validate)
 
 
     @classmethod
     def from_json(cls, root, number=None, validate=True):
+        """
+        Create an incident from a JSON object graph.
+
+        @param root: A JSON object graph.
+        @type root: L{dict}
+
+        @param number: The number of the incident.
+            If C{number} is not C{None} and C{text} includes an incident number
+            that is different than C{number}, raise an L{InvalidDataError}.
+        @type number: L{int}
+
+        @param validate: If true, raise L{InvalidDataError} is the data does
+            not validate as a fully-well-formed incident.
+        @type validate: L{bool}
+        """
         if number is None:
             raise TypeError("Incident number may not be null")
         else:
@@ -207,6 +281,41 @@ class Incident(object):
         created=None, dispatched=None, on_scene=None, closed=None,
         priority=None,
     ):
+        """
+        @param number: The incident's identifying number.
+        @type number: L{int}
+
+        @param rangers: The Rangers associated with the incident.
+        @type rangers: iterable of L{Ranger}
+
+        @param location: The location associated with the incident.
+        @type location: L{Location}
+
+        @param incident_types: The incident types associated with the incident.
+        @type incident_types: iterable of L{unicode}
+
+        @param summary: The incident's summary.
+        @type summary: L{unicode}
+
+        @param report_entries: The report entries associated with the incident.
+        @type report_entries: iterable of L{ReportEntry}
+
+        @param created: The created time for the incident.
+        @type created: L{DateTime}
+
+        @param dispatched: The dispatch time for the incident.
+        @type dispatched: L{DateTime}
+
+        @param on_scene: The on scene time for the incident.
+        @type on_scene: L{DateTime}
+
+        @param closed: The closed time for the incident.
+        @type closed: L{DateTime}
+
+        @param priority: The priority for the incident.
+        @type priority: L{int}
+        """
+
         if type(number) is not int:
             raise InvalidDataError(
                 "Incident number must be an int, not "
@@ -330,6 +439,14 @@ class Incident(object):
 
 
     def summaryFromReport(self):
+        """
+        Generate a summary.  This uses the C{summary} attribute if it is not
+        C{None} or empty; otherwise, it uses the first line of the first
+        report entry,
+
+        @return: The incident summary.
+        @rtype: L{unicode}
+        """
         if self.summary:
             return self.summary
 
@@ -342,6 +459,8 @@ class Incident(object):
     def validate(self):
         """
         Validate this incident.
+
+        @raise: L{InvalidDataError} if the incident does not validate.
         """
         if self.rangers is None:
             raise InvalidDataError("Rangers may not be None.")
@@ -417,7 +536,7 @@ class Incident(object):
 
         if not 1 <= self.priority <= 5:
             raise InvalidDataError(
-                "Incident priority must be an int, not {0!r}"
+                "Incident priority must be an int from 1 to 5, not {0!r}"
                 .format(self.priority)
             )
 
@@ -425,6 +544,13 @@ class Incident(object):
 
 
     def to_json_text(self):
+        """
+        Generate JSON text from this incident.
+
+        @return: JSON text describing this incident.
+        @rtype: L{unicode}
+        """
+
         root = {}
 
         def render_date(date_time):
@@ -480,13 +606,27 @@ class ReportEntry(object):
     """
 
     def __init__(self, author, text, created=None, system_entry=False):
+        """
+        @param author: The person who created/entered the entry.
+        @type author: L{unicode}
+
+        @param text: The report entry text.
+        @type text: L{unicode}
+
+        @param created: The created time of the report entry.
+        @type created: L{DateTime}
+
+        @param system_entry: Whether the report entry was created by the
+            IMS software (as opposed to by a user).
+        @type system_entry: L{bool}
+        """
         if created is None:
             created = DateTime.utcnow()
 
         self.author       = author
         self.text         = text
         self.created      = created
-        self.system_entry = system_entry
+        self.system_entry = bool(system_entry)
 
 
     def __str__(self):
@@ -539,6 +679,11 @@ class ReportEntry(object):
 
 
     def validate(self):
+        """
+        Validate this report entry.
+
+        @raise: L{InvalidDataError} if the report entry does not validate.
+        """
         if self.author is not None and type(self.author) is not unicode:
             raise InvalidDataError(
                 "Report entry author must be unicode, not {0!r}"
@@ -565,6 +710,17 @@ class Ranger(object):
     """
 
     def __init__(self, handle, name, status):
+        """
+        @param handle: The Ranger's handle.
+        @type handle: L{unicode}
+
+        @param name: The Ranger's name.
+        @type name: L{unicode}
+
+        @param status: The Ranger's status.
+        @type status: L{unicode}
+        """
+
         if not handle:
             raise InvalidDataError("Ranger handle required.")
 
@@ -610,14 +766,24 @@ class Ranger(object):
 
 
     def validate(self):
+        """
+        Validate this Ranger.
+
+        @raise: L{InvalidDataError} if the Ranger does not validate.
+        """
         if type(self.handle) is not unicode:
             raise InvalidDataError(
                 "Ranger handle must be unicode, not {0!r}".format(self.handle)
             )
 
-        if self.name is not None and type(self.name) is not unicode:
+        if type(self.name) is not unicode:
             raise InvalidDataError(
                 "Ranger name must be unicode, not {0!r}".format(self.handle)
+            )
+
+        if type(self.status) is not unicode:
+            raise InvalidDataError(
+                "Ranger status must be unicode, not {0!r}".format(self.status)
             )
 
 
@@ -628,6 +794,13 @@ class Location(object):
     """
 
     def __init__(self, name=None, address=None):
+        """
+        @param name: The location's name.
+        @type name: L{unicode}
+
+        @param address: The location's address.
+        @type address: L{unicode}
+        """
         self.name    = name
         self.address = address
 
@@ -675,6 +848,11 @@ class Location(object):
 
 
     def validate(self):
+        """
+        Validate this location.
+
+        @raise: L{InvalidDataError} if the location does not validate.
+        """
         if self.name and type(self.name) is not unicode:
             raise InvalidDataError(
                 "Location name must be unicode, not {0!r}"
@@ -689,119 +867,128 @@ class Location(object):
 
 
 
-class Shift(object):
-    @classmethod
-    def from_datetime(cls, position, datetime):
-        """
-        Create a shift from a datetime.
+# class Shift(object):
+#     @classmethod
+#     def from_datetime(cls, position, datetime):
+#         """
+#         Create a shift from a datetime.
 
-        @param position: a L{Values} container corresponding to the
-            position the shift is for.
+#         @param position: a L{Values} container corresponding to the
+#             position the shift is for.
 
-        @param datetime: a L{DateTime} during the shift.
-
-
-        """
-        return cls(
-            position=position,
-            date=datetime.date(),
-            name=position.shiftForTime(datetime.time()),
-        )
+#         @param datetime: a L{DateTime} during the shift.
 
 
-    def __init__(self, position, date, time=None, name=None):
-        """
-        One or both of C{time} and C{name} are required.  If both are
-        provided, they must match (meaning C{time == name.value}).
-
-        @param position: a L{Values} container corresponding to the
-            position the shift is for.
-
-        @param date: the L{Date} for the shift.
-
-        @param time: the L{Time} for the shift.
-
-        @param name: the L{ValueConstant} from the C{position}
-            container corresponding to the time of the shift.
-        """
-        if time is None:
-            if name is None:
-                raise ValueError("Both time and name may not be None.")
-            else:
-                time = name.value
-
-        if name is None:
-            name = position.lookupByValue(time)
-        elif name.value != time:
-            raise ValueError(
-                "time and name do not match: {0} != {1}"
-                .format(time, name)
-            )
-
-        self.position = position
-        self.start = DateTime(
-            year=date.year,
-            month=date.month,
-            day=date.day,
-            hour=time.hour,
-        )
-        self.name = name
+#         """
+#         return cls(
+#             position=position,
+#             date=datetime.date(),
+#             name=position.shiftForTime(datetime.time()),
+#         )
 
 
-    def __hash__(self):
-        return hash((self.position, self.name))
+#     def __init__(self, position, date, time=None, name=None):
+#         """
+#         One or both of C{time} and C{name} are required.  If both are
+#         provided, they must match (meaning C{time == name.value}).
+
+#         @param position: a L{Values} container corresponding to the
+#             position the shift is for.
+
+#         @param date: the L{Date} for the shift.
+
+#         @param time: the L{Time} for the shift.
+
+#         @param name: the L{ValueConstant} from the C{position}
+#             container corresponding to the time of the shift.
+#         """
+#         if time is None:
+#             if name is None:
+#                 raise ValueError("Both time and name may not be None.")
+#             else:
+#                 time = name.value
+
+#         if name is None:
+#             name = position.lookupByValue(time)
+#         elif name.value != time:
+#             raise ValueError(
+#                 "time and name do not match: {0} != {1}"
+#                 .format(time, name)
+#             )
+
+#         self.position = position
+#         self.start = DateTime(
+#             year=date.year,
+#             month=date.month,
+#             day=date.day,
+#             hour=time.hour,
+#         )
+#         self.name = name
 
 
-    def __eq__(self, other):
-        return (
-            self.position == other.position and
-            self.start == other.start
-        )
+#     def __hash__(self):
+#         return hash((self.position, self.name))
 
 
-    def __lt__(self, other):
-        if not isinstance(other, Shift):
-            return NotImplemented
-        return self.start < other.start
+#     def __eq__(self, other):
+#         return (
+#             self.position == other.position and
+#             self.start == other.start
+#         )
 
 
-    def __le__(self, other):
-        if not isinstance(other, Shift):
-            return NotImplemented
-        return self.start <= other.start
+#     def __lt__(self, other):
+#         if not isinstance(other, Shift):
+#             return NotImplemented
+#         return self.start < other.start
 
 
-    def __gt__(self, other):
-        if not isinstance(other, Shift):
-            return NotImplemented
-        return self.start > other.start
+#     def __le__(self, other):
+#         if not isinstance(other, Shift):
+#             return NotImplemented
+#         return self.start <= other.start
 
 
-    def __ge__(self, other):
-        if not isinstance(other, Shift):
-            return NotImplemented
-        return self.start >= other.start
+#     def __gt__(self, other):
+#         if not isinstance(other, Shift):
+#             return NotImplemented
+#         return self.start > other.start
 
 
-    def __str__(self):
-        return (
-            u"{self.start:%y-%m-%d %a} {self.name.name}"
-            .format(self=self).encode("utf-8")
-        )
+#     def __ge__(self, other):
+#         if not isinstance(other, Shift):
+#             return NotImplemented
+#         return self.start >= other.start
 
 
-    @property
-    def end(self):
-        return (self.start.time() + TimeDelta(hours=self.position.length))
+#     def __str__(self):
+#         return (
+#             u"{self.start:%y-%m-%d %a} {self.name.name}"
+#             .format(self=self).encode("utf-8")
+#         )
 
 
-    def next_shift(self):
-        return self.__class__(
-            position=self.position,
-            date=self.start.date(),
-            time=self.end,
-        )
+#     @property
+#     def end(self):
+#         return (self.start.time() + TimeDelta(hours=self.position.length))
+
+
+#     def next_shift(self):
+#         return self.__class__(
+#             position=self.position,
+#             date=self.start.date(),
+#             time=self.end,
+#         )
 
 
 def to_json_text(obj):
-    return dumps(obj, separators=(',', ':'))
+    """
+    Convert an object into JSON text.
+
+    @param obj: An object that is serializable to JSON.
+    @type obj: L{object}
+
+    @return: JSON text.
+    @rtype: L{unicode}
+    """
+    return dumps(obj, separators=(',', ':')).decode("UTF-8")
